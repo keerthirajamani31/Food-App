@@ -1,0 +1,14 @@
+﻿node_modules/
+Back-End/node_modules/
+Front-End/node_modules/
+.env
+.env.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+/dist
+/build
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

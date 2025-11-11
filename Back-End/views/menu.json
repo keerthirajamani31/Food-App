@@ -1,0 +1,93 @@
+{
+    "name": "Tea",
+    "description": "Hot and refreshing tea in various flavors",
+    "price": 40,
+    "category": "Drinks",
+    "rating": 4.3,
+    "ingredients": [
+        "tea leaves",
+        "milk",
+        "sugar",
+        "water"
+    ],
+    "image": "https://i.pinimg.com/1200x/7c/a6/54/7ca65499d4a7d6ee290c2edd656a46f2.jpg",
+    "varieties": [
+        {
+            "name": "Masala Chai",
+            "description": "Traditional Indian spiced tea",
+            "price": 50,
+            "rating": 4.5,
+            "ingredients": [
+                "tea leaves",
+                "milk",
+                "ginger",
+                "cardamom"
+            ],
+            "image": "https://i.pinimg.com/1200x/0c/79/7a/0c797ac1949348c2860a34a4ab988f5d.jpg"
+        },
+        {
+            "name": "Ginger Tea",
+            "description": "Strong ginger flavored tea",
+            "price": 45,
+            "rating": 4.4,
+            "ingredients": [
+                "tea leaves",
+                "ginger",
+                "milk",
+                "sugar"
+            ],
+            "image": "https://i.pinimg.com/736x/44/e0/d3/44e0d3baedf5c2c654cc095ea68b3fe0.jpg"
+        },
+        {
+            "name": "Green Tea",
+            "description": "Healthy green tea with lemon",
+            "price": 60,
+            "rating": 4.2,
+            "ingredients": [
+                "green tea leaves",
+                "lemon",
+                "honey"
+            ],
+            "image": "https://i.pinimg.com/736x/aa/24/31/aa2431f499d2de3871396e14e828c6ab.jpg"
+        },
+        {
+            "name": "Lemon Tea",
+            "description": "Refreshing lemon flavored tea",
+            "price": 40,
+            "rating": 4.3,
+            "ingredients": [
+                "tea leaves",
+                "lemon",
+                "honey",
+                "water"
+            ],
+            "image": "https://i.pinimg.com/736x/81/2b/8d/812b8dade62cf46dda16fdcdbb8996de.jpg"
+        },
+        {
+            "name": "Cardamom Tea",
+            "description": "Aromatic cardamom flavored tea",
+            "price": 55,
+            "rating": 4.6,
+            "ingredients": [
+                "tea leaves",
+                "cardamom",
+                "milk",
+                "sugar"
+            ],
+            "image": "https://i.pinimg.com/736x/14/91/83/14918392b21e8a08ded23f3bca1dd354.jpg"
+        },
+        {
+            "name": "Kashmiri Kahwa",
+            "description": "Traditional Kashmiri green tea with nuts",
+            "price": 80,
+            "rating": 4.7,
+            "ingredients": [
+                "green tea",
+                "saffron",
+                "almonds",
+                "honey"
+            ],
+            "image": "https://i.pinimg.com/1200x/91/f0/db/91f0db5363bbaef1c8f94de4298c430c.jpg"
+        }
+    ]
+}
