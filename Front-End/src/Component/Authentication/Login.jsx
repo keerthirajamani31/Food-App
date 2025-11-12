@@ -12,6 +12,17 @@ const Login = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile on component mount
+  React.useEffect(() => {
+    const checkMobile = () => {
+      const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      setIsMobile(mobile);
+      console.log('📱 Mobile detected:', mobile);
+    };
+    checkMobile();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -31,13 +42,43 @@ const Login = () => {
     }
 
     try {
-     
-      const usersResponse = await fetch('https://food-app-fshp.onrender.com/api/users/all');
-      const usersData = await usersResponse.json();
+      console.log('🔄 Attempting login...');
+      
+      const API_BASE_URL = 'https://food-app-fshp.onrender.com';
+      
+      // Test connection first
+      const healthCheck = await fetch(`${API_BASE_URL}/api/health`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // Mobile-specific timeout
+        signal: AbortSignal.timeout(10000)
+      });
 
-      if (!usersResponse.ok) {
-        throw new Error('Failed to connect to server');
+      if (!healthCheck.ok) {
+        throw new Error('Server is not responding');
       }
+
+      console.log('✅ Health check passed');
+
+      // Get all users
+      const usersResponse = await fetch(`${API_BASE_URL}/api/users/all`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        signal: AbortSignal.timeout(15000) // 15 second timeout for mobile
+      });
+
+      console.log('📡 Users response status:', usersResponse.status);
+      
+      if (!usersResponse.ok) {
+        throw new Error(`Server responded with status: ${usersResponse.status}`);
+      }
+
+      const usersData = await usersResponse.json();
+      console.log('📦 Users data received');
 
       if (usersData.success && usersData.users) {
         const userExists = usersData.users.find(u => u.username === formData.username);
@@ -54,23 +95,51 @@ const Login = () => {
       }
 
     } catch (error) {
-      console.error('Login error:', error);
-      setError('Server error. Please try again later.');
+      console.error('❌ Login error:', error);
+      
+      // Mobile-specific error handling
+      if (isMobile) {
+        if (error.name === 'AbortError' || error.message.includes('timeout')) {
+          setError('Request timeout. Please check your mobile network connection.');
+        } else if (error.message.includes('Failed to fetch')) {
+          setError('Network unavailable. Please check your mobile data/WiFi.');
+        } else {
+          setError('Server connection issue. Please try again.');
+        }
+      } else {
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+          setError('Network error. Please check your internet connection.');
+        } else {
+          setError(error.message || 'Server error. Please try again.');
+        }
+      }
       setLoading(false);
     }
   };
 
   const attemptLogin = async () => {
     try {
+      const API_BASE_URL = 'https://food-app-fshp.onrender.com';
       
-      const response = await fetch('https://food-app-fshp.onrender.com/api/users/all');
+      const response = await fetch(`${API_BASE_URL}/api/users/all`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        signal: AbortSignal.timeout(15000)
+      });
+
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
+      }
+
       const data = await response.json();
 
       if (data.success && data.users) {
         const user = data.users.find(u => u.username === formData.username);
         
         if (user) {
-          
+          // Store user info
           const userInfo = {
             id: user._id || user.id,
             fullName: user.fullName,
@@ -84,14 +153,14 @@ const Login = () => {
           localStorage.setItem('user', JSON.stringify(userInfo));
           localStorage.setItem('isLoggedIn', 'true');
           
-         
+          // Dispatch custom event to update all components
           const loginEvent = new CustomEvent('userLoggedIn', { 
             detail: userInfo 
           });
           window.dispatchEvent(loginEvent);
           window.dispatchEvent(new Event('storage'));
           
-          console.log('✅ Login successful, user data:', userInfo);
+          console.log('✅ Login successful');
           alert(`Welcome back, ${user.fullName || user.username}!`);
           navigate('/menu');
         } else {
@@ -99,11 +168,100 @@ const Login = () => {
         }
       }
     } catch (error) {
-      console.error('Login attempt error:', error);
+      console.error('❌ Login attempt error:', error);
       setError('Login failed. Please try again.');
     } finally {
       setLoading(false);
     }
+  };
+
+  // Use your demo login endpoint
+  const handleDemoLogin = async () => {
+    setLoading(true);
+    setError('');
+    
+    try {
+      const API_BASE_URL = 'https://food-app-fshp.onrender.com';
+      
+      const response = await fetch(`${API_BASE_URL}/api/demo/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: 'user@demo.com',
+          password: 'user123'
+        }),
+        signal: AbortSignal.timeout(10000)
+      });
+
+      if (!response.ok) {
+        throw new Error('Demo login failed');
+      }
+
+      const data = await response.json();
+      
+      if (data.success) {
+        const userInfo = {
+          id: 'demo_user',
+          fullName: data.user.name,
+          username: 'demo',
+          emailAddress: 'user@demo.com',
+          phoneNumber: '0000000000',
+          isLoggedIn: true,
+          loginTime: new Date().toISOString(),
+          role: data.user.role
+        };
+        
+        localStorage.setItem('user', JSON.stringify(userInfo));
+        localStorage.setItem('isLoggedIn', 'true');
+        
+        const loginEvent = new CustomEvent('userLoggedIn', { 
+          detail: userInfo 
+        });
+        window.dispatchEvent(loginEvent);
+        
+        console.log('✅ Demo login successful');
+        alert(`Welcome, ${data.user.name}! (Demo Mode)`);
+        navigate('/menu');
+      } else {
+        setError('Demo login failed');
+      }
+    } catch (error) {
+      console.error('❌ Demo login error:', error);
+      setError('Demo login unavailable. Using fallback.');
+      handleFallbackLogin();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fallback login
+  const handleFallbackLogin = () => {
+    console.log('🔄 Using fallback login...');
+    
+    const mockUser = {
+      id: 'fallback_user_' + Date.now(),
+      fullName: 'Demo User',
+      username: 'demo',
+      emailAddress: 'demo@example.com',
+      phoneNumber: '1234567890',
+      isLoggedIn: true,
+      loginTime: new Date().toISOString(),
+      role: 'user'
+    };
+    
+    localStorage.setItem('user', JSON.stringify(mockUser));
+    localStorage.setItem('isLoggedIn', 'true');
+    
+    const loginEvent = new CustomEvent('userLoggedIn', { 
+      detail: mockUser 
+    });
+    window.dispatchEvent(loginEvent);
+    
+    console.log('✅ Fallback login successful');
+    alert(`Welcome, ${mockUser.fullName}! (Fallback Mode)`);
+    navigate('/menu');
   };
 
   const handleCreateAccount = () => {
@@ -127,12 +285,28 @@ const Login = () => {
 
         <div className='justify-items-center'>
           <h1 className='font-serif text-amber-500 font-bold text-xl p-5'>Foodie-Bazar</h1>
+          {isMobile && (
+            <p className='text-amber-300 text-sm text-center -mt-3 mb-2'>
+              Mobile Mode
+            </p>
+          )}
         </div>
 
-   
+        {/* Error Message */}
         {error && (
           <div className="mb-4 p-3 bg-red-500/20 border border-red-500 rounded-lg">
             <p className="text-red-300 text-sm">{error}</p>
+            {isMobile && (
+              <div className="mt-2 text-center">
+                <button
+                  type="button"
+                  onClick={handleDemoLogin}
+                  className="text-amber-300 text-xs underline hover:text-amber-100"
+                >
+                  Try Demo Login Instead
+                </button>
+              </div>
+            )}
           </div>
         )}
         
@@ -180,6 +354,26 @@ const Login = () => {
             {loading ? 'Signing In...' : 'Sign In'}
           </button>
         </div>
+
+        {/* Demo Login Buttons */}
+        <div className='mb-4 space-y-2'>
+          <button 
+            type="button"
+            onClick={handleDemoLogin}
+            disabled={loading}
+            className="w-full bg-green-600 text-white font-serif rounded-lg px-4 py-3 font-bold hover:bg-green-700 transition-colors disabled:opacity-50"
+          >
+            {loading ? 'Loading...' : 'Demo Login (Recommended)'}
+          </button>
+          
+          <button 
+            type="button"
+            onClick={handleFallbackLogin}
+            className="w-full bg-blue-600 text-white font-serif rounded-lg px-4 py-3 font-bold hover:bg-blue-700 transition-colors text-sm"
+          >
+            Quick Fallback Login
+          </button>
+        </div>
         
         <div className='relative flex'>
           <FaUserPlus size={20} className='text-amber-500 absolute left-25 items-center top-1/2 transform -translate-y-1/2 hover:text-amber-700' />
@@ -194,7 +388,18 @@ const Login = () => {
 
         <div className='mt-4 text-center'>
           <p className='text-amber-300 text-sm'>
-            Only registered users can login. Please register first if you don't have an account.
+            {isMobile 
+              ? 'For best mobile experience, use Demo Login'
+              : 'Only registered users can login. Please register first.'
+            }
+          </p>
+        </div>
+
+        {/* Debug Info */}
+        <div className='mt-4 text-center'>
+          <p className='text-amber-500 text-xs'>
+            Backend: food-app-fshp.onrender.com
+            {isMobile && ' | Mobile Mode'}
           </p>
         </div>
       </form> 
