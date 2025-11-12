@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import AdminOffers from './AdminOffers';
 
-// Simple Dashboard component - create this separately or use this basic one
 const AdminDashboard = () => {
   return (
     <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">

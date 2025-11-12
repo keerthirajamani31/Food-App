@@ -42,8 +42,8 @@ const Register = () => {
     }
 
     try {
-      // Send data to your API endpoint
-      const response = await fetch('http://localhost:3000/api/users/', {
+      // UPDATED: Using Render backend URL
+      const response = await fetch('https://food-app-fshp.onrender.com/api/users/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -31,8 +31,8 @@ const Login = () => {
     }
 
     try {
-      // First, check if user exists in the API
-      const usersResponse = await fetch('http://localhost:3000/api/users/all');
+     
+      const usersResponse = await fetch('https://food-app-fshp.onrender.com/api/users/all');
       const usersData = await usersResponse.json();
 
       if (!usersResponse.ok) {
@@ -48,8 +48,6 @@ const Login = () => {
           return;
         }
 
-        // Since we don't have a proper login endpoint yet, we'll use this approach
-        // In production, you should create a proper login endpoint
         await attemptLogin();
       } else {
         throw new Error('Invalid response from server');
@@ -64,16 +62,15 @@ const Login = () => {
 
   const attemptLogin = async () => {
     try {
-      // For now, we'll fetch all users and simulate login
-      // This is a temporary solution until you implement proper authentication
-      const response = await fetch('http://localhost:3000/api/users/all');
+      
+      const response = await fetch('https://food-app-fshp.onrender.com/api/users/all');
       const data = await response.json();
 
       if (data.success && data.users) {
         const user = data.users.find(u => u.username === formData.username);
         
         if (user) {
-          // Store user info (without password)
+          
           const userInfo = {
             id: user._id || user.id,
             fullName: user.fullName,
@@ -87,7 +84,7 @@ const Login = () => {
           localStorage.setItem('user', JSON.stringify(userInfo));
           localStorage.setItem('isLoggedIn', 'true');
           
-          // Dispatch custom event to update all components
+         
           const loginEvent = new CustomEvent('userLoggedIn', { 
             detail: userInfo 
           });
@@ -132,7 +129,7 @@ const Login = () => {
           <h1 className='font-serif text-amber-500 font-bold text-xl p-5'>Foodie-Bazar</h1>
         </div>
 
-        {/* Error Message */}
+   
         {error && (
           <div className="mb-4 p-3 bg-red-500/20 border border-red-500 rounded-lg">
             <p className="text-red-300 text-sm">{error}</p>
