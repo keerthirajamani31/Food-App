@@ -29,13 +29,12 @@ const MenuItemCard = ({ item, theme = 'light' }) => {
   const handleClick = () => {
     console.log('MenuItemCard clicked:', item.name)
     
-    // Determine the correct category for URL
     let urlCategory = item.category.toLowerCase()
     if (item.category === 'South Indian Specialties') {
       urlCategory = 'breakfast'
     }
     
-    // Encode the item name for URL
+
     const encodedItemName = encodeURIComponent(item.name)
     const targetUrl = `/menu/${urlCategory}/${encodedItemName}`
     
@@ -57,7 +56,7 @@ const MenuItemCard = ({ item, theme = 'light' }) => {
       </div>
 
       <div className="p-3 sm:p-4 md:p-6 flex flex-col h-32 sm:h-36 md:h-40">
-        {/* Header with title and rating */}
+      
         <div className="flex justify-between items-start mb-2 gap-2">
           <h3 className={titleClasses}>{item.name}</h3>
           <span className={ratingClasses}>
@@ -65,12 +64,11 @@ const MenuItemCard = ({ item, theme = 'light' }) => {
           </span>
         </div>
 
-        {/* Description */}
         <p className={`${descriptionClasses} flex-1 overflow-hidden`}>
           {item.description}
         </p>
 
-        {/* CTA */}
+       
         <div className={ctaClasses}>
           View {item.varieties?.length || 0} varieties →
         </div>
