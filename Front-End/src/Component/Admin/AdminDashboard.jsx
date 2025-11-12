@@ -203,10 +203,10 @@ const AdminDashboard = () => {
   const Dashboard = () => {
     return (
       <>
-        {/* Mobile Header */}
+        {/* Mobile Header - REMOVED: No duplicate Foodie-Bazar Admin here */}
         <div className="lg:hidden bg-amber-700 text-white p-4 mb-6 rounded-lg">
           <h1 className="text-xl font-bold">Admin Dashboard</h1>
-          <p className="text-amber-100 text-sm">Welcome to Foodie-Bazar Admin</p>
+          <p className="text-amber-100 text-sm">Manage your restaurant operations</p>
         </div>
 
         {/* Stats Grid - Mobile Responsive */}
@@ -344,7 +344,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-amber-50">
-      {/* Mobile Header */}
+      {/* Mobile Header - Only Hamburger Menu and Title */}
       <div className="lg:hidden bg-amber-800 text-white p-4">
         <div className="flex items-center justify-between">
           <button
@@ -353,10 +353,7 @@ const AdminDashboard = () => {
           >
             <span className="text-xl">☰</span>
           </button>
-          <div className="flex items-center space-x-3">
-            <span className="text-2xl">🍽️</span>
-            <h1 className="text-lg font-bold">Foodie-Bazar Admin</h1>
-          </div>
+          <h1 className="text-lg font-bold">Admin Panel</h1>
           <div className="w-8"></div>
         </div>
       </div>
@@ -365,7 +362,7 @@ const AdminDashboard = () => {
         {/* Sidebar - Hidden on mobile by default */}
         <div className={`${isSidebarOpen ? 'block' : 'hidden'} lg:block w-64 bg-amber-800 min-h-screen p-4 lg:p-6 fixed lg:relative z-50 lg:z-auto`}>
           <div className="space-y-2 sm:space-y-4">
-            {/* Sidebar Header with Spoon Icon */}
+            {/* Sidebar Header with Spoon Icon - ONLY PLACE with Foodie-Bazar Admin */}
             <div className="flex items-center space-x-3 mb-6">
               <span className="text-2xl text-amber-200">🍽️</span>
               <h1 className="text-xl font-bold text-amber-100">Foodie-Bazar Admin</h1>
@@ -432,7 +429,7 @@ const AdminDashboard = () => {
 
         {/* Main Content */}
         <div className="flex-1 p-4 sm:p-6 lg:p-8">
-          {/* Desktop Header - Removed duplicate Foodie-Bazar Admin */}
+          {/* Desktop Header - No Foodie-Bazar Admin here */}
           <div className="hidden lg:block mb-6">
             <h1 className="text-2xl lg:text-3xl font-bold text-amber-800 mb-2">
               {currentView === 'dashboard' ? 'Dashboard' : 
