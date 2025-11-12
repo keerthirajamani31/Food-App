@@ -1,54 +1,44 @@
 import React, { useState, useEffect } from 'react';
-import { FaTrash, FaPlus, FaMinus, FaShoppingCart, FaArrowLeft, FaUser } from 'react-icons/fa';
+import { FaTrash, FaPlus, FaMinus, FaShoppingCart, FaArrowLeft, FaUser, FaSignInAlt } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
 
-  // Check if user is logged in - with real-time updates
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Check authentication
   useEffect(() => {
     const checkAuth = () => {
       try {
         const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
         const userData = JSON.parse(localStorage.getItem('user') || 'null');
-        
-        console.log('🔄 Auth check - Logged in:', loggedIn, 'User:', userData);
-        
         setIsLoggedIn(loggedIn);
         setUser(userData);
-        
-        if (!loggedIn) {
-          setTimeout(() => {
-            alert('Please login to access your cart!');
-            navigate('/login');
-          }, 100);
-          return;
-        }
       } catch (error) {
-        console.error('Error checking auth:', error);
         setIsLoggedIn(false);
       }
     };
 
-    // Check immediately
     checkAuth();
 
-    // Listen for storage changes (when login happens in another tab/component)
-    const handleStorageChange = () => {
-      console.log('📦 Storage changed, checking auth...');
-      checkAuth();
-    };
+    const handleStorageChange = () => checkAuth();
+    const handleLoginEvent = () => checkAuth();
 
-    // Listen for custom login event (triggered from Login component)
-    const handleLoginEvent = () => {
-      console.log('🔑 Login event received, updating user...');
-      checkAuth();
-    };
-
-    // Set up event listeners
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('userLoggedIn', handleLoginEvent);
     
@@ -64,26 +54,37 @@ const Cart = () => {
       const savedCart = JSON.parse(localStorage.getItem('cart') || '[]');
       setCartItems(savedCart);
     } catch (error) {
-      console.error('Error loading cart:', error);
       setCartItems([]);
     }
   };
 
   useEffect(() => {
-    if (isLoggedIn) {
-      loadCart();
-
-      const handleCartUpdate = () => {
-        loadCart();
-      };
-
-      window.addEventListener('cartUpdate', handleCartUpdate);
-      
-      return () => {
-        window.removeEventListener('cartUpdate', handleCartUpdate);
-      };
+    // On mobile: always load cart (no login check)
+    // On laptop: only load cart if logged in
+    if (isMobile) {
+      loadCart(); // Mobile: always load
+    } else if (isLoggedIn) {
+      loadCart(); // Laptop: only load if logged in
     }
-  }, [isLoggedIn]);
+
+    const handleCartUpdate = () => {
+      if (isMobile || isLoggedIn) {
+        loadCart();
+      }
+    };
+
+    window.addEventListener('cartUpdate', handleCartUpdate);
+    
+    return () => {
+      window.removeEventListener('cartUpdate', handleCartUpdate);
+    };
+  }, [isLoggedIn, isMobile]);
+
+  const updateCart = (updatedCart) => {
+    setCartItems(updatedCart);
+    localStorage.setItem('cart', JSON.stringify(updatedCart));
+    window.dispatchEvent(new Event('cartUpdate'));
+  };
 
   const increaseQuantity = (itemId) => {
     const updatedCart = cartItems.map(item =>
@@ -91,8 +92,7 @@ const Cart = () => {
         ? { ...item, quantity: item.quantity + 1 }
         : item
     );
-    setCartItems(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
+    updateCart(updatedCart);
   };
 
   const decreaseQuantity = (itemId) => {
@@ -104,19 +104,22 @@ const Cart = () => {
       )
       .filter(item => item.quantity > 0);
     
-    setCartItems(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
+    updateCart(updatedCart);
   };
 
   const removeFromCart = (itemId) => {
     const updatedCart = cartItems.filter(item => item.id !== itemId);
-    setCartItems(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
+    updateCart(updatedCart);
   };
 
   const clearCart = () => {
     setCartItems([]);
     localStorage.setItem('cart', '[]');
+    window.dispatchEvent(new Event('cartUpdate'));
+  };
+
+  const handleLogin = () => {
+    navigate('/login');
   };
 
   const handleLogout = () => {
@@ -124,8 +127,8 @@ const Cart = () => {
     localStorage.removeItem('isLoggedIn');
     setIsLoggedIn(false);
     setUser(null);
+    window.dispatchEvent(new Event('userLoggedOut'));
     alert('Logged out successfully!');
-    navigate('/');
   };
 
   const handleCheckout = () => {
@@ -134,14 +137,24 @@ const Cart = () => {
       return;
     }
 
-    // Create order object - FIXED: Use emailAddress instead of email
+    // Always require login for checkout (both mobile and laptop)
+    if (!isLoggedIn) {
+      const proceedToLogin = window.confirm(
+        'To complete your order, please login or create an account. Continue to login?'
+      );
+      if (proceedToLogin) {
+        navigate('/login');
+      }
+      return;
+    }
+
+    // Create order object
     const order = {
       id: `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       customerName: user?.username || 'Customer',
-      customerEmail: user?.emailAddress || user?.email || 'No email provided', // FIXED THIS LINE
+      customerEmail: user?.emailAddress || user?.email || 'No email provided',
       items: cartItems.map(item => ({
         ...item,
-        // Ensure all items have required fields
         image: item.image || 'https://via.placeholder.com/150',
         variety: item.variety || 'Standard'
       })),
@@ -150,30 +163,21 @@ const Cart = () => {
       date: new Date().toISOString(),
       address: user?.address || 'No address provided',
       phone: user?.phoneNumber || user?.phone || 'No phone provided',
-      paymentMethod: 'cash-on-delivery' // Add default payment method
+      paymentMethod: 'cash-on-delivery'
     };
 
-    console.log('📦 Saving order:', order); // Debug log
-
-    // Save order to localStorage
     try {
       const existingOrders = JSON.parse(localStorage.getItem('orders') || '[]');
       existingOrders.push(order);
       localStorage.setItem('orders', JSON.stringify(existingOrders));
       
-      // Trigger order update events
       window.dispatchEvent(new Event('newOrder'));
       window.dispatchEvent(new Event('orderUpdate'));
-      window.dispatchEvent(new Event('storage')); // Add this for broader compatibility
       
-      console.log('✅ Order saved successfully'); // Debug log
       alert(`Order placed successfully! Thank you, ${user?.username || 'Customer'}`);
       clearCart();
-      
-      // Redirect to orders page after checkout
       navigate('/orders');
     } catch (error) {
-      console.error('Error placing order:', error);
       alert('Error placing order. Please try again.');
     }
   };
@@ -183,8 +187,8 @@ const Cart = () => {
   const deliveryFee = subtotal > 0 ? 40 : 0;
   const total = subtotal + tax + deliveryFee;
 
-  // If not logged in, show login prompt
-  if (!isLoggedIn) {
+  // On laptop: show login prompt if not logged in
+  if (!isMobile && !isLoggedIn) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="bg-white rounded-lg shadow-lg p-8 text-center max-w-md">
@@ -213,7 +217,7 @@ const Cart = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-6xl mx-auto">
-        {/* Header with User Info */}
+        {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <Link 
             to="/menu" 
@@ -225,10 +229,17 @@ const Cart = () => {
           
           <div className="text-center">
             <h1 className="text-4xl font-bold text-gray-800 mb-2">Your Cart</h1>
-            <div className="flex items-center justify-center gap-2 text-gray-600">
-              <FaUser className="text-orange-500" />
-              <span>Welcome, {user?.username || 'User'}!</span>
-            </div>
+            {isLoggedIn ? (
+              <div className="flex items-center justify-center gap-2 text-gray-600">
+                <FaUser className="text-orange-500" />
+                <span>Welcome, {user?.username || 'User'}!</span>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center gap-2 text-amber-600">
+                <FaSignInAlt className="text-amber-500" />
+                <span>Guest User - Login to checkout</span>
+              </div>
+            )}
           </div>
           
           <div className="flex items-center gap-4">
@@ -240,18 +251,21 @@ const Cart = () => {
                 Clear Cart
               </button>
             )}
-            <button 
-              onClick={handleLogout}
-              className="text-gray-600 hover:text-gray-800 transition-colors font-semibold text-sm"
-            >
-              Logout
-            </button>
-            <Link 
-              to="/orders"
-              className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors font-semibold"
-            >
-              View Orders
-            </Link>
+            {isLoggedIn ? (
+              <button 
+                onClick={handleLogout}
+                className="text-gray-600 hover:text-gray-800 transition-colors font-semibold text-sm"
+              >
+                Logout
+              </button>
+            ) : (
+              <button 
+                onClick={handleLogin}
+                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-semibold"
+              >
+                Login
+              </button>
+            )}
           </div>
         </div>
 
@@ -330,10 +344,17 @@ const Cart = () => {
 
             <div className="lg:col-span-1">
               <div className="bg-white rounded-lg shadow-lg p-6 sticky top-4">
-                <div className="flex items-center gap-2 mb-4">
-                  <FaUser className="text-orange-500" />
-                  <span className="font-semibold text-gray-800">{user?.username || 'User'}</span>
-                </div>
+                {isLoggedIn ? (
+                  <div className="flex items-center gap-2 mb-4">
+                    <FaUser className="text-orange-500" />
+                    <span className="font-semibold text-gray-800">{user?.username || 'User'}</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 mb-4 p-3 bg-amber-50 rounded-lg">
+                    <FaSignInAlt className="text-amber-500" />
+                    <span className="font-semibold text-amber-700">Guest User</span>
+                  </div>
+                )}
                 
                 <h3 className="text-xl font-bold text-gray-800 mb-4">Order Summary</h3>
                 
@@ -359,9 +380,13 @@ const Cart = () => {
 
                 <button 
                   onClick={handleCheckout}
-                  className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors mb-3 shadow-md"
+                  className={`w-full text-white py-3 rounded-lg font-semibold transition-colors mb-3 shadow-md ${
+                    isLoggedIn 
+                      ? 'bg-green-600 hover:bg-green-700' 
+                      : 'bg-amber-500 hover:bg-amber-600'
+                  }`}
                 >
-                  Place Order
+                  {isLoggedIn ? 'Place Order' : 'Login to Checkout'}
                 </button>
                 
                 <Link 
