@@ -34,8 +34,9 @@ const Banner2 = () => {
             </p>
           </div>
 
-          {/* Features Grid */}
-          <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 lg:gap-8 py-4 sm:py-6'>
+          {/* Features Grid - FIXED 2x2 Layout */}
+          <div className='grid grid-cols-2 gap-4 sm:gap-6 lg:gap-8 py-4 sm:py-6'>
+            {/* Row 1 - Instant Ordering */}
             <div className='flex flex-col items-center text-center'>
               <div className='bg-amber-500 rounded-full flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 text-white mb-2 sm:mb-3'>
                 <AiOutlineThunderbolt className='text-lg sm:text-xl lg:text-2xl' />
@@ -48,6 +49,7 @@ const Banner2 = () => {
               </span>
             </div>
             
+            {/* Row 1 - Always Open */}
             <div className='flex flex-col items-center text-center'>
               <div className='bg-pink-400 rounded-full flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 text-white mb-2 sm:mb-3'>
                 <CiClock2 className='text-lg sm:text-xl lg:text-2xl' />
@@ -60,6 +62,7 @@ const Banner2 = () => {
               </span>
             </div>
             
+            {/* Row 2 - Exclusive Booking */}
             <div className='flex flex-col items-center text-center'>
               <div className='bg-pink-400 rounded-full flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 text-white mb-2 sm:mb-3'>
                 <TbBrandBooking className='text-lg sm:text-xl lg:text-2xl' />
@@ -72,6 +75,7 @@ const Banner2 = () => {
               </span>
             </div>
             
+            {/* Row 2 - Signature Dishes */}
             <div className='flex flex-col items-center text-center'>
               <div className='bg-gradient-to-br from-purple-400 to-indigo-600 rounded-full flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 text-white mb-2 sm:mb-3'>
                 <FaFire className='text-lg sm:text-xl lg:text-2xl' />
@@ -86,7 +90,7 @@ const Banner2 = () => {
           </div>
 
           {/* Button */}
-          <div className='bg-amber-500 text-white font-serif italic p-3 sm:p-4 text-base sm:text-lg lg:text-xl rounded-md hover:bg-amber-600 transition-colors duration-300 cursor-pointer text-center lg:text-left'>
+          <div className='bg-amber-500 text-white font-serif italic p-3 sm:p-4 text-base sm:text-lg lg:text-xl rounded-md hover:bg-amber-600 transition-colors duration-300 cursor-pointer text-center'>
             <button className='font-bold w-full'>
               Unveil our legacy
             </button>
