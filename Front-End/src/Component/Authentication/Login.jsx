@@ -42,33 +42,17 @@ const Login = () => {
     }
 
     try {
-      console.log('🔄 Attempting login...');
+      console.log('🔄 Attempting normal login...');
       
       const API_BASE_URL = 'https://food-app-fshp.onrender.com';
       
-      // Test connection first
-      const healthCheck = await fetch(`${API_BASE_URL}/api/health`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        // Mobile-specific timeout
-        signal: AbortSignal.timeout(10000)
-      });
-
-      if (!healthCheck.ok) {
-        throw new Error('Server is not responding');
-      }
-
-      console.log('✅ Health check passed');
-
-      // Get all users
+      // Get all users to validate credentials
       const usersResponse = await fetch(`${API_BASE_URL}/api/users/all`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-        signal: AbortSignal.timeout(15000) // 15 second timeout for mobile
+        signal: AbortSignal.timeout(15000)
       });
 
       console.log('📡 Users response status:', usersResponse.status);
@@ -78,65 +62,14 @@ const Login = () => {
       }
 
       const usersData = await usersResponse.json();
-      console.log('📦 Users data received');
+      console.log('📦 Users data received:', usersData);
 
       if (usersData.success && usersData.users) {
-        const userExists = usersData.users.find(u => u.username === formData.username);
-        
-        if (!userExists) {
-          setError('User not found! Please register first.');
-          setLoading(false);
-          return;
-        }
-
-        await attemptLogin();
-      } else {
-        throw new Error('Invalid response from server');
-      }
-
-    } catch (error) {
-      console.error('❌ Login error:', error);
-      
-      // Mobile-specific error handling
-      if (isMobile) {
-        if (error.name === 'AbortError' || error.message.includes('timeout')) {
-          setError('Request timeout. Please check your mobile network connection.');
-        } else if (error.message.includes('Failed to fetch')) {
-          setError('Network unavailable. Please check your mobile data/WiFi.');
-        } else {
-          setError('Server connection issue. Please try again.');
-        }
-      } else {
-        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
-          setError('Network error. Please check your internet connection.');
-        } else {
-          setError(error.message || 'Server error. Please try again.');
-        }
-      }
-      setLoading(false);
-    }
-  };
-
-  const attemptLogin = async () => {
-    try {
-      const API_BASE_URL = 'https://food-app-fshp.onrender.com';
-      
-      const response = await fetch(`${API_BASE_URL}/api/users/all`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        signal: AbortSignal.timeout(15000)
-      });
-
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (data.success && data.users) {
-        const user = data.users.find(u => u.username === formData.username);
+        // Find user with matching username AND password
+        const user = usersData.users.find(u => 
+          u.username === formData.username && 
+          u.password === formData.password // Direct password comparison (since it's plain text in your DB)
+        );
         
         if (user) {
           // Store user info
@@ -160,22 +93,47 @@ const Login = () => {
           window.dispatchEvent(loginEvent);
           window.dispatchEvent(new Event('storage'));
           
-          console.log('✅ Login successful');
+          console.log('✅ Normal login successful');
           alert(`Welcome back, ${user.fullName || user.username}!`);
           navigate('/menu');
         } else {
-          setError('Invalid credentials!');
+          // Check if username exists but password is wrong
+          const userExists = usersData.users.find(u => u.username === formData.username);
+          if (userExists) {
+            setError('Invalid password! Please check your password.');
+          } else {
+            setError('User not found! Please register first.');
+          }
+        }
+      } else {
+        throw new Error('Invalid response from server');
+      }
+
+    } catch (error) {
+      console.error('❌ Login error:', error);
+      
+      // Mobile-specific error handling
+      if (isMobile) {
+        if (error.name === 'AbortError' || error.message.includes('timeout')) {
+          setError('Request timeout. Please check your mobile network connection.');
+        } else if (error.message.includes('Failed to fetch')) {
+          setError('Network unavailable. Please check your mobile data/WiFi.');
+        } else {
+          setError('Server connection issue. Please try again.');
+        }
+      } else {
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+          setError('Network error. Please check your internet connection.');
+        } else {
+          setError(error.message || 'Server error. Please try again.');
         }
       }
-    } catch (error) {
-      console.error('❌ Login attempt error:', error);
-      setError('Login failed. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  // Use your demo login endpoint
+  // Enhanced demo login
   const handleDemoLogin = async () => {
     setLoading(true);
     setError('');
@@ -220,6 +178,7 @@ const Login = () => {
           detail: userInfo 
         });
         window.dispatchEvent(loginEvent);
+        window.dispatchEvent(new Event('storage'));
         
         console.log('✅ Demo login successful');
         alert(`Welcome, ${data.user.name}! (Demo Mode)`);
@@ -258,10 +217,19 @@ const Login = () => {
       detail: mockUser 
     });
     window.dispatchEvent(loginEvent);
+    window.dispatchEvent(new Event('storage'));
     
     console.log('✅ Fallback login successful');
     alert(`Welcome, ${mockUser.fullName}! (Fallback Mode)`);
     navigate('/menu');
+  };
+
+  // Quick test credentials for development
+  const handleTestCredentials = (username, password) => {
+    setFormData({
+      username: username,
+      password: password
+    });
   };
 
   const handleCreateAccount = () => {
@@ -355,6 +323,29 @@ const Login = () => {
           </button>
         </div>
 
+        {/* Test Credentials for Development */}
+        <div className='mb-4 space-y-2'>
+          <div className='text-center'>
+            <p className='text-amber-300 text-sm mb-2'>Test Credentials:</p>
+            <div className='flex gap-2 justify-center'>
+              <button 
+                type="button"
+                onClick={() => handleTestCredentials('john_doe', 'password123')}
+                className="bg-blue-600 text-white text-xs px-3 py-1 rounded hover:bg-blue-700 transition-colors"
+              >
+                John Doe
+              </button>
+              <button 
+                type="button"
+                onClick={() => handleTestCredentials('jane_smith', 'password123')}
+                className="bg-purple-600 text-white text-xs px-3 py-1 rounded hover:bg-purple-700 transition-colors"
+              >
+                Jane Smith
+              </button>
+            </div>
+          </div>
+        </div>
+
         {/* Demo Login Buttons */}
         <div className='mb-4 space-y-2'>
           <button 
@@ -390,7 +381,7 @@ const Login = () => {
           <p className='text-amber-300 text-sm'>
             {isMobile 
               ? 'For best mobile experience, use Demo Login'
-              : 'Only registered users can login. Please register first.'
+              : 'Enter your username and password to login normally'
             }
           </p>
         </div>
@@ -400,6 +391,13 @@ const Login = () => {
           <p className='text-amber-500 text-xs'>
             Backend: food-app-fshp.onrender.com
             {isMobile && ' | Mobile Mode'}
+          </p>
+        </div>
+
+        {/* Login Instructions */}
+        <div className='mt-3 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg'>
+          <p className='text-amber-300 text-xs text-center'>
+            💡 <strong>Normal Login:</strong> Use your registered username and password
           </p>
         </div>
       </form> 
