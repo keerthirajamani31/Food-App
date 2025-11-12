@@ -51,7 +51,7 @@ const Navbar = () => {
     
     alert('Logged out successfully!');
     navigate('/');
-    setOpen(false); // Close menu after logout
+    setOpen(false);
   };
 
   const handleCartClick = (e) => {
@@ -60,7 +60,7 @@ const Navbar = () => {
       alert('Please login to view your cart!');
       navigate('/login');
     }
-    setOpen(false); // Close menu after cart click
+    setOpen(false);
   };
 
   const closeMenu = () => {
@@ -199,64 +199,78 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Navigation Menu */}
-        <div className={`md:hidden absolute top-full left-0 right-0 bg-[#2D1B0E] border-t border-amber-900/30 shadow-lg transition-all duration-300 z-40 ${
-          isOpen ? 'max-h-screen opacity-100 py-4' : 'max-h-0 opacity-0 overflow-hidden py-0'
+        {/* Mobile Navigation Menu - FIXED VERSION */}
+        <div className={`md:hidden fixed top-0 left-0 right-0 bottom-0 bg-[#2D1B0E] z-40 transition-all duration-300 transform ${
+          isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}>
-          <div className='px-6 space-y-4'>
+          <div className='flex flex-col h-full pt-20 pb-8 px-6 overflow-y-auto'>
+            
+            {/* Close Button */}
+            <button
+              onClick={() => setOpen(false)}
+              className='absolute top-4 right-4 p-2 text-amber-100 hover:text-amber-400'
+            >
+              <FaTimes size={24} />
+            </button>
+
             {/* Navigation Links */}
-            <Link 
-              to='/'
-              className='flex items-center gap-4 text-amber-100 hover:text-amber-400 font-medium transition-all duration-200 text-lg py-3 border-b border-amber-900/30'
-              onClick={closeMenu}
-            >
-              <FaHome className="text-amber-400" />
-              <span>Home</span>
-            </Link>
-            
-            <Link 
-              to='/menu'
-              className='flex items-center gap-4 text-amber-100 hover:text-amber-400 font-medium transition-all duration-200 text-lg py-3 border-b border-amber-900/30'
-              onClick={closeMenu}
-            >
-              <MdMenuBook className="text-amber-400" />
-              <span>Menu</span>
-            </Link>
-            
-            <Link 
-              to='/about'
-              className='flex items-center gap-4 text-amber-100 hover:text-amber-400 font-medium transition-all duration-200 text-lg py-3 border-b border-amber-900/30'
-              onClick={closeMenu}
-            >
-              <IoMdStarOutline className="text-amber-400" />
-              <span>About</span>
-            </Link>
-            
-            <Link 
-              to='/contact'
-              className='flex items-center gap-4 text-amber-100 hover:text-amber-400 font-medium transition-all duration-200 text-lg py-3 border-b border-amber-900/30'
-              onClick={closeMenu}
-            >
-              <FaPhoneAlt className="text-amber-400" />
-              <span>Contact</span>
-            </Link>
+            <div className='space-y-6 flex-1'>
+              <Link 
+                to='/'
+                className='flex items-center gap-4 text-amber-100 hover:text-amber-400 font-medium transition-all duration-200 text-xl py-4 border-b border-amber-900/30'
+                onClick={closeMenu}
+              >
+                <FaHome className="text-amber-400 text-2xl" />
+                <span>Home</span>
+              </Link>
+              
+              <Link 
+                to='/menu'
+                className='flex items-center gap-4 text-amber-100 hover:text-amber-400 font-medium transition-all duration-200 text-xl py-4 border-b border-amber-900/30'
+                onClick={closeMenu}
+              >
+                <MdMenuBook className="text-amber-400 text-2xl" />
+                <span>Menu</span>
+              </Link>
+              
+              <Link 
+                to='/about'
+                className='flex items-center gap-4 text-amber-100 hover:text-amber-400 font-medium transition-all duration-200 text-xl py-4 border-b border-amber-900/30'
+                onClick={closeMenu}
+              >
+                <IoMdStarOutline className="text-amber-400 text-2xl" />
+                <span>About</span>
+              </Link>
+              
+              <Link 
+                to='/contact'
+                className='flex items-center gap-4 text-amber-100 hover:text-amber-400 font-medium transition-all duration-200 text-xl py-4 border-b border-amber-900/30'
+                onClick={closeMenu}
+              >
+                <FaPhoneAlt className="text-amber-400 text-2xl" />
+                <span>Contact</span>
+              </Link>
+            </div>
 
             {/* Mobile Authentication Section */}
-            <div className="pt-4 border-t border-amber-900/50 space-y-4">
+            <div className="border-t border-amber-900/50 pt-6 mt-6">
               {user ? (
                 <>
                   {/* User Info */}
-                  <div className="flex items-center gap-4 text-amber-100 py-2">
-                    <FaUser className="text-amber-400" />
-                    <span className="font-medium">{user.fullName || user.username}</span>
+                  <div className="flex items-center gap-4 text-amber-100 py-4 mb-4">
+                    <FaUser className="text-amber-400 text-2xl" />
+                    <div>
+                      <span className="font-medium text-lg block">{user.fullName || user.username}</span>
+                      <span className="text-amber-300 text-sm">Welcome back!</span>
+                    </div>
                   </div>
                   
                   {/* Logout Button */}
                   <button
                     onClick={handleLogout}
-                    className="flex items-center gap-4 bg-gradient-to-br from-red-500 to-red-700 rounded-lg px-4 py-3 text-white hover:from-red-600 hover:to-red-800 transition-all duration-200 w-full text-lg font-medium"
+                    className="flex items-center gap-4 bg-gradient-to-br from-red-500 to-red-700 rounded-lg px-6 py-4 text-white hover:from-red-600 hover:to-red-800 transition-all duration-200 w-full text-lg font-medium"
                   >
-                    <FaSignOutAlt />
+                    <FaSignOutAlt className="text-xl" />
                     <span>Logout</span>
                   </button>
                 </>
@@ -264,25 +278,25 @@ const Navbar = () => {
                 /* Login Button */
                 <Link 
                   to="/login"
-                  className='flex items-center gap-4 bg-gradient-to-br from-amber-500 to-amber-700 rounded-lg px-4 py-3 text-amber-100 hover:from-amber-600 hover:to-amber-800 transition-all duration-200 text-lg font-medium w-full'
+                  className='flex items-center gap-4 bg-gradient-to-br from-amber-500 to-amber-700 rounded-lg px-6 py-4 text-amber-100 hover:from-amber-600 hover:to-amber-800 transition-all duration-200 text-lg font-medium w-full text-center justify-center'
                   onClick={closeMenu}
                 >
-                  <LuKey />
-                  <span>Login</span>
+                  <LuKey className="text-xl" />
+                  <span>Login to Your Account</span>
                 </Link>
               )}
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Overlay when mobile menu is open */}
-      {isOpen && (
-        <div 
-          className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
-          onClick={() => setOpen(false)}
-        />
-      )}
+        {/* Overlay when mobile menu is open */}
+        {isOpen && (
+          <div 
+            className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
+            onClick={() => setOpen(false)}
+          />
+        )}
+      </div>
     </nav>
   )
 }
