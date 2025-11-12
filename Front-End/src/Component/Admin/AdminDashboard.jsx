@@ -353,7 +353,10 @@ const AdminDashboard = () => {
           >
             <span className="text-xl">☰</span>
           </button>
-          <h1 className="text-lg font-bold">Foodie-Bazar Admin</h1>
+          <div className="flex items-center space-x-3">
+            <span className="text-2xl">🍽️</span>
+            <h1 className="text-lg font-bold">Foodie-Bazar Admin</h1>
+          </div>
           <div className="w-8"></div>
         </div>
       </div>
@@ -362,7 +365,9 @@ const AdminDashboard = () => {
         {/* Sidebar - Hidden on mobile by default */}
         <div className={`${isSidebarOpen ? 'block' : 'hidden'} lg:block w-64 bg-amber-800 min-h-screen p-4 lg:p-6 fixed lg:relative z-50 lg:z-auto`}>
           <div className="space-y-2 sm:space-y-4">
-            <div className="hidden lg:block mb-6">
+            {/* Sidebar Header with Spoon Icon */}
+            <div className="flex items-center space-x-3 mb-6">
+              <span className="text-2xl text-amber-200">🍽️</span>
               <h1 className="text-xl font-bold text-amber-100">Foodie-Bazar Admin</h1>
             </div>
             
@@ -427,7 +432,7 @@ const AdminDashboard = () => {
 
         {/* Main Content */}
         <div className="flex-1 p-4 sm:p-6 lg:p-8">
-          {/* Desktop Header */}
+          {/* Desktop Header - Removed duplicate Foodie-Bazar Admin */}
           <div className="hidden lg:block mb-6">
             <h1 className="text-2xl lg:text-3xl font-bold text-amber-800 mb-2">
               {currentView === 'dashboard' ? 'Dashboard' : 
