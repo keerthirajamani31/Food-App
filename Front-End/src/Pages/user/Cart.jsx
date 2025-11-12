@@ -29,8 +29,15 @@ const Cart = () => {
         const userData = JSON.parse(localStorage.getItem('user') || 'null');
         setIsLoggedIn(loggedIn);
         setUser(userData);
+
+        // On laptop: redirect to login if not logged in
+        if (!isMobile && !loggedIn) {
+          setTimeout(() => {
+            alert('Please login to access your cart!');
+            navigate('/login');
+          }, 100);
+        }
       } catch (error) {
-        console.error('Error checking auth:', error);
         setIsLoggedIn(false);
       }
     };
@@ -47,7 +54,7 @@ const Cart = () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('userLoggedIn', handleLoginEvent);
     };
-  }, [navigate]);
+  }, [navigate, isMobile]);
 
   // Load cart function
   const loadCart = () => {
@@ -55,24 +62,27 @@ const Cart = () => {
       const savedCart = JSON.parse(localStorage.getItem('cart') || '[]');
       setCartItems(savedCart);
     } catch (error) {
-      console.error('Error loading cart:', error);
       setCartItems([]);
     }
   };
 
   useEffect(() => {
-    loadCart();
-
-    const handleCartUpdate = () => {
+    // On mobile: always load cart
+    // On laptop: only load cart if logged in
+    if (isMobile || isLoggedIn) {
       loadCart();
-    };
 
-    window.addEventListener('cartUpdate', handleCartUpdate);
-    
-    return () => {
-      window.removeEventListener('cartUpdate', handleCartUpdate);
-    };
-  }, []);
+      const handleCartUpdate = () => {
+        loadCart();
+      };
+
+      window.addEventListener('cartUpdate', handleCartUpdate);
+      
+      return () => {
+        window.removeEventListener('cartUpdate', handleCartUpdate);
+      };
+    }
+  }, [isLoggedIn, isMobile]);
 
   const updateCart = (updatedCart) => {
     setCartItems(updatedCart);
@@ -131,6 +141,7 @@ const Cart = () => {
       return;
     }
 
+    // If not logged in, ask to login first (both mobile and laptop)
     if (!isLoggedIn) {
       const proceedToLogin = window.confirm(
         'To complete your order, please login or create an account. Continue to login?'
@@ -166,13 +177,11 @@ const Cart = () => {
       
       window.dispatchEvent(new Event('newOrder'));
       window.dispatchEvent(new Event('orderUpdate'));
-      window.dispatchEvent(new Event('storage'));
       
       alert(`Order placed successfully! Thank you, ${user?.username || 'Customer'}`);
       clearCart();
       navigate('/orders');
     } catch (error) {
-      console.error('Error placing order:', error);
       alert('Error placing order. Please try again.');
     }
   };
@@ -182,143 +191,153 @@ const Cart = () => {
   const deliveryFee = subtotal > 0 ? 40 : 0;
   const total = subtotal + tax + deliveryFee;
 
+  // On laptop: show login prompt if not logged in
+  if (!isMobile && !isLoggedIn) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="bg-white rounded-lg shadow-lg p-8 text-center max-w-md">
+          <FaShoppingCart className="text-orange-400 text-6xl mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Login Required</h2>
+          <p className="text-gray-600 mb-6">Please login to access your shopping cart</p>
+          <div className="space-y-3">
+            <button 
+              onClick={() => navigate('/login')}
+              className="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors"
+            >
+              Go to Login
+            </button>
+            <button 
+              onClick={() => navigate('/menu')}
+              className="w-full bg-gray-500 text-white py-3 rounded-lg font-semibold hover:bg-gray-600 transition-colors"
+            >
+              Continue Browsing
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 py-4 px-3 sm:px-4">
+    <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-6xl mx-auto">
-        {/* Header - Mobile Responsive */}
-        <div className={`flex items-center justify-between mb-6 ${isMobile ? 'flex-col gap-4 text-center' : ''}`}>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
           <Link 
             to="/menu" 
-            className="flex items-center gap-2 text-orange-600 hover:text-orange-700 transition-colors font-semibold text-sm sm:text-base"
+            className="flex items-center gap-2 text-orange-600 hover:text-orange-700 transition-colors font-semibold"
           >
             <FaArrowLeft />
-            <span>{isMobile ? 'Back' : 'Back to Menu'}</span>
+            <span>Back to Menu</span>
           </Link>
           
-          <div className={`${isMobile ? 'order-first' : ''}`}>
-            <h1 className={`font-bold text-gray-800 mb-2 ${isMobile ? 'text-2xl' : 'text-4xl'}`}>
-              Your Cart
-            </h1>
+          <div className="text-center">
+            <h1 className="text-4xl font-bold text-gray-800 mb-2">Your Cart</h1>
             {isLoggedIn ? (
-              <div className="flex items-center justify-center gap-2 text-gray-600 text-sm">
+              <div className="flex items-center justify-center gap-2 text-gray-600">
                 <FaUser className="text-orange-500" />
                 <span>Welcome, {user?.username || 'User'}!</span>
               </div>
             ) : (
-              <div className="flex items-center justify-center gap-2 text-amber-600 text-sm">
+              <div className="flex items-center justify-center gap-2 text-amber-600">
                 <FaSignInAlt className="text-amber-500" />
-                <span>Guest User - <button onClick={handleLogin} className="underline">Login</button></span>
+                <span>Guest User</span>
               </div>
             )}
           </div>
           
-          <div className={`flex items-center gap-3 ${isMobile ? 'flex-wrap justify-center' : ''}`}>
+          <div className="flex items-center gap-4">
             {cartItems.length > 0 && (
               <button 
                 onClick={clearCart}
-                className="text-red-500 hover:text-red-700 transition-colors font-semibold text-xs sm:text-sm"
+                className="text-red-500 hover:text-red-700 transition-colors font-semibold"
               >
-                {isMobile ? 'Clear' : 'Clear Cart'}
+                Clear Cart
               </button>
             )}
             {isLoggedIn ? (
-              <>
-                <button 
-                  onClick={handleLogout}
-                  className="text-gray-600 hover:text-gray-800 transition-colors font-semibold text-xs sm:text-sm"
-                >
-                  {isMobile ? 'Logout' : 'Logout'}
-                </button>
-                <Link 
-                  to="/orders"
-                  className="bg-orange-500 text-white px-3 py-2 rounded-lg hover:bg-orange-600 transition-colors font-semibold text-xs sm:text-sm"
-                >
-                  {isMobile ? 'Orders' : 'View Orders'}
-                </Link>
-              </>
+              <button 
+                onClick={handleLogout}
+                className="text-gray-600 hover:text-gray-800 transition-colors font-semibold text-sm"
+              >
+                Logout
+              </button>
             ) : (
               <button 
                 onClick={handleLogin}
-                className="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-colors font-semibold text-xs sm:text-sm"
+                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-semibold"
               >
-                {isMobile ? 'Login' : 'Login to Order'}
+                Login
               </button>
             )}
           </div>
         </div>
 
         {cartItems.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-lg p-6 sm:p-12 text-center">
-            <FaShoppingCart className="text-orange-400 text-4xl sm:text-6xl mx-auto mb-4" />
-            <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">Your cart is empty</h3>
-            <p className="text-gray-600 mb-6 text-sm sm:text-base">Add some delicious items from our menu</p>
+          <div className="bg-white rounded-lg shadow-lg p-12 text-center">
+            <FaShoppingCart className="text-orange-400 text-6xl mx-auto mb-4" />
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">Your cart is empty</h3>
+            <p className="text-gray-600 mb-6">Add some delicious items from our menu</p>
             <Link 
               to="/menu"
-              className="bg-orange-500 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-lg hover:bg-orange-600 transition-colors font-semibold inline-block text-sm sm:text-base"
+              className="bg-orange-500 text-white px-8 py-3 rounded-lg hover:bg-orange-600 transition-colors font-semibold inline-block"
             >
               Browse Menu
             </Link>
           </div>
         ) : (
-          <div className={`${isMobile ? 'flex flex-col gap-4' : 'grid grid-cols-1 lg:grid-cols-3 gap-8'}`}>
-            {/* Cart Items - Mobile Responsive */}
-            <div className={isMobile ? '' : 'lg:col-span-2'}>
-              <div className="space-y-3 sm:space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
+              <div className="space-y-4">
                 {cartItems.map(item => (
-                  <div key={item.id} className="bg-white rounded-lg shadow-lg p-4 sm:p-6 hover:shadow-xl transition-all duration-300">
-                    <div className={`flex items-center gap-3 sm:gap-4 ${isMobile ? 'flex-col sm:flex-row text-center sm:text-left' : ''}`}>
+                  <div key={item.id} className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-all duration-300">
+                    <div className="flex items-center gap-4">
                       <img
                         src={item.image}
                         alt={item.name}
-                        className={`object-cover rounded-lg flex-shrink-0 ${isMobile ? 'w-16 h-16 mx-auto sm:mx-0' : 'w-20 h-20'}`}
+                        className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
                         onError={(e) => {
                           e.target.src = 'https://via.placeholder.com/150';
                         }}
                       />
                       
-                      <div className={`flex-1 min-w-0 ${isMobile ? 'w-full' : ''}`}>
-                        <h3 className="font-semibold text-gray-800 truncate text-sm sm:text-lg">{item.name}</h3>
-                        <p className="text-gray-600 text-xs sm:text-sm mb-2 line-clamp-2">{item.description}</p>
-                        <span className="text-green-600 font-bold text-sm sm:text-lg">₹{item.price}</span>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-lg text-gray-800 truncate">{item.name}</h3>
+                        <p className="text-gray-600 text-sm mb-2 line-clamp-2">{item.description}</p>
+                        <span className="text-green-600 font-bold text-lg">₹{item.price}</span>
                       </div>
                       
-                      <div className="flex items-center gap-2 sm:gap-3 justify-center">
+                      <div className="flex items-center gap-3">
                         <button 
                           onClick={() => decreaseQuantity(item.id)}
-                          className={`rounded-full bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-gray-200 transition-colors disabled:opacity-50 ${
-                            isMobile ? 'w-7 h-7' : 'w-8 h-8'
-                          }`}
+                          className="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-gray-200 transition-colors disabled:opacity-50"
                           disabled={item.quantity <= 1}
                         >
-                          <FaMinus size={isMobile ? 10 : 12} />
+                          <FaMinus size={12} />
                         </button>
                         
-                        <span className={`font-semibold text-gray-800 ${
-                          isMobile ? 'w-6 text-sm' : 'w-8 text-lg'
-                        } text-center`}>
+                        <span className="w-8 text-center font-semibold text-gray-800 text-lg">
                           {item.quantity}
                         </span>
                         
                         <button 
                           onClick={() => increaseQuantity(item.id)}
-                          className={`rounded-full bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-gray-200 transition-colors ${
-                            isMobile ? 'w-7 h-7' : 'w-8 h-8'
-                          }`}
+                          className="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-gray-200 transition-colors"
                         >
-                          <FaPlus size={isMobile ? 10 : 12} />
+                          <FaPlus size={12} />
                         </button>
                       </div>
                       
-                      <div className={`text-right ${isMobile ? 'w-full flex justify-between items-center mt-2' : 'min-w-20'}`}>
-                        <div className={`font-bold text-gray-800 ${isMobile ? 'text-base' : 'text-lg'}`}>
+                      <div className="text-right min-w-20">
+                        <div className="font-bold text-gray-800 text-lg">
                           ₹{(item.price * item.quantity).toFixed(2)}
                         </div>
                         <button 
                           onClick={() => removeFromCart(item.id)}
-                          className="text-red-500 hover:text-red-700 transition-colors flex items-center gap-1 text-xs sm:text-sm"
+                          className="text-red-500 hover:text-red-700 transition-colors mt-2 flex items-center gap-1 text-sm"
                         >
-                          <FaTrash size={isMobile ? 12 : 14} />
-                          {isMobile ? '' : 'Remove'}
+                          <FaTrash size={14} />
+                          Remove
                         </button>
                       </div>
                     </div>
@@ -327,44 +346,37 @@ const Cart = () => {
               </div>
             </div>
 
-            {/* Order Summary - Mobile Responsive */}
-            <div className={isMobile ? 'sticky bottom-0 bg-white p-4 rounded-t-lg shadow-2xl border-t' : 'lg:col-span-1'}>
-              <div className={`bg-white rounded-lg shadow-lg p-4 sm:p-6 ${isMobile ? '' : 'sticky top-4'}`}>
+            <div className="lg:col-span-1">
+              <div className="bg-white rounded-lg shadow-lg p-6 sticky top-4">
                 {isLoggedIn ? (
                   <div className="flex items-center gap-2 mb-4">
                     <FaUser className="text-orange-500" />
-                    <span className="font-semibold text-gray-800 text-sm sm:text-base">{user?.username || 'User'}</span>
+                    <span className="font-semibold text-gray-800">{user?.username || 'User'}</span>
                   </div>
                 ) : (
                   <div className="flex items-center gap-2 mb-4 p-3 bg-amber-50 rounded-lg">
                     <FaSignInAlt className="text-amber-500" />
-                    <span className="font-semibold text-amber-700 text-sm">Guest User</span>
-                    <button 
-                      onClick={handleLogin}
-                      className="ml-auto text-amber-600 hover:text-amber-800 text-xs font-semibold underline"
-                    >
-                      Login
-                    </button>
+                    <span className="font-semibold text-amber-700">Guest User</span>
                   </div>
                 )}
                 
-                <h3 className="text-lg sm:text-xl font-bold text-gray-800 mb-4">Order Summary</h3>
+                <h3 className="text-xl font-bold text-gray-800 mb-4">Order Summary</h3>
                 
-                <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
-                  <div className="flex justify-between text-gray-600 text-sm sm:text-base">
+                <div className="space-y-3 mb-6">
+                  <div className="flex justify-between text-gray-600">
                     <span>Subtotal ({cartItems.reduce((total, item) => total + item.quantity, 0)} items)</span>
                     <span>₹{subtotal.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between text-gray-600 text-sm sm:text-base">
+                  <div className="flex justify-between text-gray-600">
                     <span>Tax (10%)</span>
                     <span>₹{tax.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between text-gray-600 text-sm sm:text-base">
+                  <div className="flex justify-between text-gray-600">
                     <span>Delivery Fee</span>
                     <span>₹{deliveryFee.toFixed(2)}</span>
                   </div>
-                  <hr className="my-2 sm:my-3" />
-                  <div className="flex justify-between font-bold text-gray-800 text-base sm:text-lg">
+                  <hr className="my-3" />
+                  <div className="flex justify-between text-lg font-bold text-gray-800">
                     <span>Total</span>
                     <span>₹{total.toFixed(2)}</span>
                   </div>
@@ -378,22 +390,19 @@ const Cart = () => {
                       : 'bg-amber-500 hover:bg-amber-600'
                   }`}
                 >
-                  {isLoggedIn 
-                    ? (isMobile ? 'Place Order 🚀' : 'Place Order') 
-                    : (isMobile ? 'Login to Order' : 'Login to Place Order')
-                  }
+                  {isLoggedIn ? 'Place Order' : 'Login to Checkout'}
                 </button>
                 
                 <Link 
                   to="/menu"
-                  className="w-full bg-orange-500 text-white py-2 sm:py-2 rounded-lg font-semibold hover:bg-orange-600 transition-colors text-center block shadow-md text-sm sm:text-base"
+                  className="w-full bg-orange-500 text-white py-2 rounded-lg font-semibold hover:bg-orange-600 transition-colors text-center block shadow-md"
                 >
-                  {isMobile ? 'Add More Items' : 'Continue Shopping'}
+                  Continue Shopping
                 </Link>
 
                 {subtotal > 0 && subtotal < 299 && (
-                  <div className="mt-3 sm:mt-4 p-2 sm:p-3 bg-amber-50 border border-amber-200 rounded-lg text-center">
-                    <p className="text-amber-700 text-xs sm:text-sm">
+                  <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-center">
+                    <p className="text-amber-700 text-sm">
                       Add ₹{(299 - subtotal).toFixed(2)} more for free delivery!
                     </p>
                   </div>
