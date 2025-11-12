@@ -14,12 +14,12 @@ const MenuItemCard = ({ item, theme = 'light' }) => {
   `
 
   const titleClasses = `font-bold ${isDark ? 'text-amber-100' : 'text-gray-800'} text-sm sm:text-base md:text-xl line-clamp-1`
-  const descriptionClasses = `leading-relaxed ${isDark ? 'text-amber-200' : 'text-gray-600'} text-xs sm:text-sm line-clamp-2`
-  const ratingClasses = `px-2 py-1 rounded text-xs ${
-    isDark 
-      ? 'bg-yellow-500/20 text-yellow-300 rounded-full font-bold' 
-      : 'bg-yellow-100 text-yellow-800'
-  }`
+  const descriptionClasses = `leading-relaxed ${isDark ? 'text-amber-200' : 'text-gray-600'} text-xs sm:text-sm line-clamp-3`
+  const ratingClasses = `flex items-center justify-center ${isDark 
+    ? 'bg-yellow-500/20 text-yellow-300' 
+    : 'bg-yellow-100 text-yellow-800'
+  } rounded-full text-xs font-bold w-10 h-6 sm:w-12 sm:h-7`
+  
   const ctaClasses = `text-center font-semibold py-2 border-t pt-3 ${
     isDark 
       ? 'text-orange-300 border-amber-800/30' 
@@ -56,20 +56,23 @@ const MenuItemCard = ({ item, theme = 'light' }) => {
         />
       </div>
 
-      <div className="p-3 sm:p-4 md:p-6">
-        <div className="flex justify-between items-start mb-2 sm:mb-3 gap-2">
+      <div className="p-3 sm:p-4 md:p-6 flex flex-col h-32 sm:h-36 md:h-40">
+        {/* Header with title and rating */}
+        <div className="flex justify-between items-start mb-2 gap-2">
           <h3 className={titleClasses}>{item.name}</h3>
           <span className={ratingClasses}>
-            ⭐ {item.rating}
+            ⭐{item.rating}
           </span>
         </div>
 
-        <p className={descriptionClasses}>
+        {/* Description */}
+        <p className={`${descriptionClasses} flex-1 overflow-hidden`}>
           {item.description}
         </p>
 
+        {/* CTA */}
         <div className={ctaClasses}>
-          Click to see {item.varieties?.length || 0} varieties →
+          View {item.varieties?.length || 0} varieties →
         </div>
       </div>
     </div>
