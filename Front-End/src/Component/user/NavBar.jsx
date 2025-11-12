@@ -199,90 +199,110 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* Mobile Navigation Menu - DROPDOWN VERSION */}
-        <div className={`md:hidden absolute top-full left-0 right-0 bg-[#2D1B0E] border-t border-amber-900/30 shadow-lg z-40 transition-all duration-300 ${
-          isOpen ? 'max-h-96 opacity-100 py-4' : 'max-h-0 opacity-0 overflow-hidden py-0'
-        }`}>
-          <div className='px-6 space-y-4'>
-            {/* Navigation Links */}
-            <Link 
-              to='/'
-              className='flex items-center gap-4 text-amber-100 hover:text-amber-400 font-medium transition-all duration-200 text-lg py-3'
-              onClick={closeMenu}
-            >
-              <FaHome className="text-amber-400" />
-              <span>Home</span>
-            </Link>
-            
-            <Link 
-              to='/menu'
-              className='flex items-center gap-4 text-amber-100 hover:text-amber-400 font-medium transition-all duration-200 text-lg py-3'
-              onClick={closeMenu}
-            >
-              <MdMenuBook className="text-amber-400" />
-              <span>Menu</span>
-            </Link>
-            
-            <Link 
-              to='/about'
-              className='flex items-center gap-4 text-amber-100 hover:text-amber-400 font-medium transition-all duration-200 text-lg py-3'
-              onClick={closeMenu}
-            >
-              <IoMdStarOutline className="text-amber-400" />
-              <span>About</span>
-            </Link>
-            
-            <Link 
-              to='/contact'
-              className='flex items-center gap-4 text-amber-100 hover:text-amber-400 font-medium transition-all duration-200 text-lg py-3'
-              onClick={closeMenu}
-            >
-              <FaPhoneAlt className="text-amber-400" />
-              <span>Contact</span>
-            </Link>
+        {/* Mobile Dropdown Menu - SIMPLE FIXED VERSION */}
+        {isOpen && (
+          <div className="md:hidden absolute top-full left-0 right-0 bg-[#2D1B0E] border-t border-amber-900/30 shadow-lg z-40 animate-fadeIn">
+            <div className="px-4 py-4 space-y-3">
+              {/* Navigation Links */}
+              <Link 
+                to='/'
+                className='flex items-center gap-3 text-amber-100 hover:text-amber-400 font-medium transition-all duration-200 text-lg py-3 px-2 rounded-lg hover:bg-amber-900/20'
+                onClick={closeMenu}
+              >
+                <FaHome className="text-amber-400 text-xl" />
+                <span>Home</span>
+              </Link>
+              
+              <Link 
+                to='/menu'
+                className='flex items-center gap-3 text-amber-100 hover:text-amber-400 font-medium transition-all duration-200 text-lg py-3 px-2 rounded-lg hover:bg-amber-900/20'
+                onClick={closeMenu}
+              >
+                <MdMenuBook className="text-amber-400 text-xl" />
+                <span>Menu</span>
+              </Link>
+              
+              <Link 
+                to='/about'
+                className='flex items-center gap-3 text-amber-100 hover:text-amber-400 font-medium transition-all duration-200 text-lg py-3 px-2 rounded-lg hover:bg-amber-900/20'
+                onClick={closeMenu}
+              >
+                <IoMdStarOutline className="text-amber-400 text-xl" />
+                <span>About</span>
+              </Link>
+              
+              <Link 
+                to='/contact'
+                className='flex items-center gap-3 text-amber-100 hover:text-amber-400 font-medium transition-all duration-200 text-lg py-3 px-2 rounded-lg hover:bg-amber-900/20'
+                onClick={closeMenu}
+              >
+                <FaPhoneAlt className="text-amber-400 text-xl" />
+                <span>Contact</span>
+              </Link>
 
-            {/* Mobile Authentication Section */}
-            <div className="pt-4 border-t border-amber-900/50 space-y-4">
-              {user ? (
-                <>
-                  {/* User Info */}
-                  <div className="flex items-center gap-4 text-amber-100 py-2">
-                    <FaUser className="text-amber-400" />
-                    <span className="font-medium">{user.fullName || user.username}</span>
-                  </div>
-                  
-                  {/* Logout Button */}
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center gap-4 bg-gradient-to-br from-red-500 to-red-700 rounded-lg px-4 py-3 text-white hover:from-red-600 hover:to-red-800 transition-all duration-200 w-full text-lg font-medium"
+              {/* User Section */}
+              <div className="pt-3 border-t border-amber-900/50 space-y-3">
+                {user ? (
+                  <>
+                    {/* User Info */}
+                    <div className="flex items-center gap-3 text-amber-100 py-2 px-2">
+                      <FaUser className="text-amber-400 text-xl" />
+                      <div>
+                        <span className="font-medium text-lg block">{user.fullName || user.username}</span>
+                        <span className="text-amber-300 text-sm">Welcome back!</span>
+                      </div>
+                    </div>
+                    
+                    {/* Logout Button */}
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center gap-3 bg-gradient-to-br from-red-500 to-red-700 rounded-lg px-4 py-3 text-white hover:from-red-600 hover:to-red-800 transition-all duration-200 w-full text-lg font-medium"
+                    >
+                      <FaSignOutAlt className="text-xl" />
+                      <span>Logout</span>
+                    </button>
+                  </>
+                ) : (
+                  /* Login Button */
+                  <Link 
+                    to="/login"
+                    className='flex items-center gap-3 bg-gradient-to-br from-amber-500 to-amber-700 rounded-lg px-4 py-3 text-amber-100 hover:from-amber-600 hover:to-amber-800 transition-all duration-200 text-lg font-medium w-full text-center justify-center'
+                    onClick={closeMenu}
                   >
-                    <FaSignOutAlt />
-                    <span>Logout</span>
-                  </button>
-                </>
-              ) : (
-                /* Login Button */
-                <Link 
-                  to="/login"
-                  className='flex items-center gap-4 bg-gradient-to-br from-amber-500 to-amber-700 rounded-lg px-4 py-3 text-amber-100 hover:from-amber-600 hover:to-amber-800 transition-all duration-200 text-lg font-medium w-full'
-                  onClick={closeMenu}
-                >
-                  <LuKey />
-                  <span>Login</span>
-                </Link>
-              )}
+                    <LuKey className="text-xl" />
+                    <span>Login to Your Account</span>
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        )}
+
+        {/* Overlay when mobile menu is open - Click outside to close */}
+        {isOpen && (
+          <div 
+            className="md:hidden fixed inset-0 bg-black bg-opacity-30 z-30"
+            onClick={() => setOpen(false)}
+          />
+        )}
       </div>
 
-      {/* Overlay when mobile menu is open - Click outside to close */}
-      {isOpen && (
-        <div 
-          className="md:hidden fixed inset-0 bg-black bg-opacity-30 z-30"
-          onClick={() => setOpen(false)}
-        />
-      )}
+      {/* Add custom animation */}
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.2s ease-out;
+        }
+      `}</style>
     </nav>
   )
 }
