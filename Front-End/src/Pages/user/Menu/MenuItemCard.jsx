@@ -1,0 +1,79 @@
+import React from 'react'
+import { useNavigate } from 'react-router-dom'
+
+const MenuItemCard = ({ item, theme = 'light' }) => {
+  const navigate = useNavigate()
+  const isDark = theme === 'dark'
+  
+  const cardClasses = `
+    rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer transform hover:scale-105
+    ${isDark 
+      ? 'bg-white/10 backdrop-blur-md border border-amber-800/30' 
+      : 'bg-white border border-gray-100'
+    }
+  `
+
+  const titleClasses = `text-xl font-bold ${isDark ? 'text-amber-100' : 'text-gray-800'}`
+  const descriptionClasses = `mb-4 leading-relaxed ${isDark ? 'text-amber-200 text-sm' : 'text-gray-600'}`
+  const ratingClasses = `px-2 py-1 rounded text-sm ${
+    isDark 
+      ? 'bg-yellow-500/20 text-yellow-300 rounded-full text-xs font-bold' 
+      : 'bg-yellow-100 text-yellow-800'
+  }`
+  const ctaClasses = `text-center font-semibold py-2 border-t pt-4 ${
+    isDark 
+      ? 'text-orange-300 border-amber-800/30' 
+      : 'text-orange-500 border-gray-200'
+  }`
+
+  const handleClick = () => {
+    console.log('MenuItemCard clicked:', item.name)
+    
+    // Determine the correct category for URL
+    let urlCategory = item.category.toLowerCase()
+    if (item.category === 'South Indian Specialties') {
+      urlCategory = 'breakfast'
+    }
+    
+    // Encode the item name for URL
+    const encodedItemName = encodeURIComponent(item.name)
+    const targetUrl = `/menu/${urlCategory}/${encodedItemName}`
+    
+    console.log('Navigating to:', targetUrl)
+    navigate(targetUrl)
+  }
+
+  return (
+    <div 
+      className={cardClasses}
+      onClick={handleClick}
+    >
+      <div className="h-56 overflow-hidden">
+        <img
+          src={item.image}
+          alt={item.name}
+          className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+        />
+      </div>
+
+      <div className="p-6">
+        <div className="flex justify-between items-start mb-3 gap-3">
+          <h3 className={titleClasses}>{item.name}</h3>
+          <span className={ratingClasses}>
+            ⭐ {item.rating}
+          </span>
+        </div>
+
+        <p className={descriptionClasses}>
+          {item.description}
+        </p>
+
+        <div className={ctaClasses}>
+          Click to see {item.varieties?.length || 0} varieties →
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default MenuItemCard

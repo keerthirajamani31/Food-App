@@ -1,0 +1,88 @@
+[
+  {
+    "image":"https://i.pinimg.com/736x/4b/b1/cd/4bb1cd1316c7fe75a2e3173d17e6535e.jpg",
+    "title": "Kebab",
+    "rating": 4.5,
+    "description": "Juicy grilled meat skewers with aromatic spices",
+    "price":140
+  },
+  {
+      "image":"https://i.pinimg.com/736x/3c/14/c7/3c14c704d670b936291ffb090734eaab.jpg",
+    "title": "Chicken Chargha",
+    "rating": 4.8,
+    "description": "Whole chicken marinated in traditional spices and deep-fried",
+    "price":160
+  },
+  {
+    "image":"https://i.pinimg.com/1200x/66/d2/cd/66d2cd1642ef44ff621fdc4d9a14fa09.jpg",
+    "title": "Chicken Tikka",
+    "rating": 4.7,
+    "description": "Tender chicken pieces grilled in tandoor with yogurt marinade",
+    "price":170
+  },
+  {
+      "image":"https://i.pinimg.com/736x/cc/0e/c6/cc0ec678549698920af1632150a0e361.jpg",
+    "title": "Desi Chowmein",
+    "rating": 4.3,
+    "description": "Spicy stir-fried noodles with vegetables and desi masala",
+    "price":200
+  },
+   {
+    "image": "https://i.pinimg.com/1200x/1a/59/f0/1a59f0e988c227075ce7a6e261f9f362.jpg",
+    "title": "Chicken Biryani",
+    "rating": 4.9,
+    "description": "Fragrant basmati rice cooked with tender chicken and aromatic spices",
+    "price": 220
+  },
+  {
+    "image": "https://i.pinimg.com/1200x/b0/19/5a/b0195a70ff66476c038f4099e2b12846.jpg",
+    "title": "Haleem",
+    "rating": 4.6,
+    "description": "Slow-cooked wheat and meat porridge with traditional spices",
+    "price": 180
+  },
+  {
+    "image": "https://i.pinimg.com/1200x/57/92/cd/5792cda43b25064f34736eeb3dcb92ed.jpg",
+    "title": "Nihari",
+    "rating": 4.7,
+    "description": "Slow-cooked beef shank in rich and spicy gravy",
+    "price": 190
+  },
+  {
+    "image": "https://i.pinimg.com/1200x/94/df/51/94df513fa9e37e75f1dc581392a29085.jpg",
+    "title": "Dahi Bhalla Chaat",
+    "rating": 4.4,
+    "description": "Lentil dumplings in yogurt topped with sweet and tangy chutneys",
+    "price": 120
+  },
+  {
+    "image": "https://i.pinimg.com/736x/b4/3d/6e/b43d6ee2ce9195dce483e606c515333d.jpg",
+    "title": "Chicken Karahi",
+    "rating": 4.8,
+    "description": "Chicken cooked in wok with tomatoes, ginger, and green chilies",
+    "price": 210
+  },
+  {
+    "image": "https://i.pinimg.com/1200x/61/5c/db/615cdbdbff444630d5e726a44788377c.jpg",
+    "title": "Beef Samosa",
+    "rating": 4.5,
+    "description": "Crispy pastry filled with spiced minced beef and herbs",
+    "price": 100
+  },
+  {
+    "image": "https://i.pinimg.com/736x/59/44/60/594460c479552d79a7050f4a88fd6c4e.jpg",
+    "title": "Royal Falooda",
+    "rating": 4.6,
+    "description": "Vermicelli dessert drink with ice cream, nuts, and rose syrup",
+    "price": 150
+  },
+  {
+    "image": "https://i.pinimg.com/736x/96/76/8d/96768d83089609691c67fd30eb776002.jpg",
+    "title": "Aloo Paratha",
+    "rating": 4.4,
+    "description": "Whole wheat flatbread stuffed with spiced potato filling",
+    "price": 80
+  }
+
+
+]

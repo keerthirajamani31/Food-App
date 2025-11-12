@@ -1,0 +1,620 @@
+{
+  "menu": {
+    "categories": [
+      {
+        "name": "Breakfast",
+        "items": [
+          {
+            "id": 1,
+            "name": "Dosa",
+            "description": "Crispy fermented crepe with spiced potato filling",
+            "category": "Dosa",
+            
+            "rating": 4.5,
+            "ingredients": ["rice batter", "potato", "onion", "spices", "chutney"],
+            "image": "https://i.pinimg.com/736x/2b/35/43/2b3543cf136127e86cffce7c835b5a61.jpg",
+            "varieties": [
+              {
+                "id": 1,
+                "name": "Masala Dosa",
+                "description": " dosa with spiced potato filling",
+                "price": 80,
+                "rating": 4.5,
+                "ingredients": ["rice batter", "potato", "onion", "spices", "chutney"],
+                "image": "https://i.pinimg.com/1200x/d4/d0/55/d4d05510d95f793fd27855bbe5851f20.jpg"
+              },
+              {
+                "id": 2,
+                "name": "Plain Dosa",
+                "description": "Simple crispy crepe with chutney",
+                "price": 60,
+                "rating": 4.3,
+                "ingredients": ["rice batter", "chutney", "sambar"],
+                "image": "https://i.pinimg.com/1200x/bd/53/d0/bd53d0bc9e3e62eeae51c669a8040735.jpg"
+              },
+              {
+                "id": 3,
+                "name": "Onion Dosa",
+                "description": "Crispy dosa topped with onions",
+                "price": 70,
+                "rating": 4.4,
+                "ingredients": ["rice batter", "onion", "green chili", "chutney"],
+                "image": "https://i.pinimg.com/736x/cb/8c/83/cb8c83c9fb03243b639c46232392ca0a.jpg"
+              },
+              {
+                "id": 3,
+                "name": "Rava Dosa",
+                "description": "Crispy dosa topped with onions",
+                "price": 70,
+                "rating": 4.4,
+                "ingredients": ["rice batter", "onion", "green chili", "chutney"],
+                "image": "https://i.pinimg.com/736x/26/7f/a5/267fa56772cd3d2928a7626e953bf003.jpg"
+              }
+
+            ]
+          },
+          {
+            "id": 2,
+            "name": "Idli Sambar",
+            "description": "Soft steamed rice cakes with lentil soup",
+            "category": "Steamed",
+            "price": 60,
+            "rating": 4.3,
+            "ingredients": ["rice", "urad dal", "sambar", "chutney"],
+            "image": "https://i.pinimg.com/1200x/ef/2f/cb/ef2fcbf03d24969cc9277990d6363b24.jpg",
+            "varieties": [
+              {
+                "id": 1,
+                "name": "Mini Idli",
+                "description": "Soft steamed rice cakes",
+                "price": 50,
+                "rating": 4.3,
+                "ingredients": ["rice", "urad dal", "chutney", "sambar"],
+                "image": "https://i.pinimg.com/1200x/5b/09/c8/5b09c8163f586ef737baf1053730f505.jpg"
+              },
+              {
+                "id": 2,
+                "name": "Rava Idli",
+                "description": "Semolina idli with cashews",
+                "price": 60,
+                "rating": 4.4,
+                "ingredients": ["rava", "curd", "cashew", "curry leaves", "chutney"],
+                "image": "https://i.pinimg.com/1200x/d0/5f/7b/d05f7b1dd10a97f83dc7260a156f59cc.jpg"
+              },
+              {
+                "id": 3,
+                "name": "podi Idli",
+                "description": "Semolina idli with cashews",
+                "price": 60,
+                "rating": 4.4,
+                "ingredients": ["rice batter", "idlipodi","curry leaves", "chutney"],
+                "image": "https://i.pinimg.com/736x/c9/cb/cc/c9cbcc64fc8b458bdb4d94d3a1d3a23e.jpg"
+              },
+              {
+                "id": 4,
+                "name": "Millet Idli",
+                "description": "Semolina idli with millet",
+                "price": 60,
+                "rating": 4.4,
+                "ingredients": ["rice batter",  "Millets", "curry leaves", "chutney"],
+                "image": "https://i.pinimg.com/1200x/b0/ff/6b/b0ff6b9a04a5891735db75fc828306f1.jpg"
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "name": "Pongal",
+            "description": "Comforting rice and lentil porridge with sweetness",
+            "category": "Porridge",
+            "price": 70,
+            "rating": 4.4,
+            "ingredients": ["rice", "moong dal", "ghee", "pepper", "cumin"],
+            "image": "https://i.pinimg.com/736x/bc/15/10/bc151087ff5964849f7069f928f675ac.jpg",
+            "varieties": [
+              {
+                "id": 1,
+                "name": "Ven Pongal",
+                "description": "Savory rice and lentil porridge",
+                "price": 70,
+                "rating": 4.4,
+                "ingredients": ["rice", "moong dal", "ghee", "pepper", "cumin"],
+                "image": "https://i.pinimg.com/736x/67/a2/4e/67a24e112b0f86bddc29466d1285cc96.jpg"
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "name": "Vada",
+            "description": "Crispy lentil doughnuts with chutney",
+            "category": "Fried",
+            "price": 50,
+            "rating": 4.2,
+            "ingredients": ["urad dal", "pepper", "curry leaves", "chutney"],
+            "image": "https://i.pinimg.com/736x/05/49/7f/05497fb17e66a7c5cfdd75e624b3720c.jpg",
+            "varieties": [
+              {
+                "id": 1,
+                "name": "Medu Vada",
+                "description": "Soft lentil doughnuts",
+                "price": 50,
+                "rating": 4.2,
+                "ingredients": ["urad dal", "pepper", "curry leaves", "chutney"],
+                "image": "https://i.pinimg.com/736x/05/49/7f/05497fb17e66a7c5cfdd75e624b3720c.jpg"
+              },
+               {
+                "id": 2,
+                "name": "Vazhaipoo Vada",
+                "description": "Soft lentil doughnuts",
+                "price": 50,
+                "rating": 4.2,
+                "ingredients": ["urad dal", "pepper", "curry leaves", "chutney","valzhai poo"],
+                "image": "https://i.pinimg.com/1200x/a2/81/f1/a281f1d2f54b1ca803572d0fea489e0d.jpg"
+              },
+               {
+                "id": 3,
+                "name": "Paruppu Vada",
+                "description": "Soft lentil doughnuts",
+                "price": 50,
+                "rating": 4.2,
+                "ingredients": ["urad dal", "pepper", "curry leaves", "chutney"],
+                "image": "https://i.pinimg.com/1200x/c7/39/5c/c7395cd3982d36996104d0906520a584.jpg"
+              },
+               {
+                "id": 4,
+                "name": " sweet Vada",
+                "description": "Soft lentil doughnuts",
+                "price": 50,
+                "rating": 4.2,
+                "ingredients": ["urad dal", "maida", "curry leaves", "chutney"],
+                "image": "https://i.pinimg.com/736x/6f/6f/02/6f6f02d348e20456a2091765e87c28c6.jpg"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Lunch",
+        "items": [
+          {
+            
+            "name": "South Indian Thali",
+            "description": "Complete meal with rice, sambar, rasam, vegetables and curd",
+            "category": "Veg Meal",
+            "price": 180,
+            "rating": 4.6,
+            "ingredients": ["rice", "sambar", "rasam", "vegetables", "curd"],
+            "image": "https://i.pinimg.com/1200x/6d/a2/64/6da26458a59ae90a6f1c2657dca8b047.jpg",
+            "varieties": [
+              {
+              
+                "name": "Classic Thali",
+                "description": " all authentic dishes",
+                "price": 180,
+                "rating": 4.6,
+                "ingredients": ["rice", "sambar", "rasam", "vegetables", "curd"],
+                "image": "https://i.pinimg.com/1200x/6d/a2/64/6da26458a59ae90a6f1c2657dca8b047.jpg"
+              },
+              {
+              
+                "name": "Special Thali",
+                "description": "Premium thali with extra dishes",
+                "price": 220,
+                "rating": 4.7,
+                "ingredients": ["rice", "sambar", "rasam", "poriyal", "payasam"],
+                "image": "https://i.pinimg.com/1200x/a0/bf/23/a0bf239359ee4137fc38baba10a5e622.jpg"
+              },
+              {
+             
+                "name": "Veg Briyani",
+                "description": "Spicy Briyani with authentic dishes",
+                "price": 180,
+                "rating": 4.6,
+                "ingredients": ["rice", "sambar", "rasam", "vegetables", "curd"],
+                "image": "https://i.pinimg.com/736x/0c/ea/64/0cea6408411e3bd5d1e416d173f76a78.jpg"
+              },
+              {
+              
+                "name": "Veg Meals",
+                "description": "all authentic dishes",
+                "price": 180,
+                "rating": 4.6,
+                "ingredients": ["rice", "sambar", "rasam", "vegetables", "curd"],
+                "image": "https://i.pinimg.com/1200x/6d/a2/64/6da26458a59ae90a6f1c2657dca8b047.jpg"
+              }
+            ]
+          },
+          {
+      
+            "name": "Non-veg Meal",
+            "description": "Spicy chicken curry with steamed rice and sides",
+            "category": "Non-Veg Meal",
+            "price": 220,
+            "rating": 4.7,
+            "ingredients": ["chicken", "onion", "tomato", "coconut", "spices"],
+            "image": "https://i.pinimg.com/736x/1a/59/f0/1a59f0e988c227075ce7a6e261f9f362.jpg",
+            "varieties": [
+              {
+              
+                "name": "Chicken Curry Meal",
+                "description": "Spicy chicken curry with rice",
+                "price": 220,
+                "rating": 4.7,
+                "ingredients": ["chicken", "onion", "tomato", "coconut", "spices"],
+                "image": "https://i.pinimg.com/736x/1a/59/f0/1a59f0e988c227075ce7a6e261f9f362.jpg"
+              }
+            ]
+          },
+          {
+            
+            "name": "Meals Combo",
+            "description": "Traditional meal with multiple courses",
+            "category": "Veg Meal",
+            "price": 150,
+            "rating": 4.4,
+            "ingredients": ["rice", "sambar", "rasam", "poriyal", "payasam"],
+            "image": "https://i.pinimg.com/1200x/ec/ac/38/ecac38f46bc461161c414679acb7700c.jpg",
+            "varieties": [
+              {
+              
+                "name": "Veg Meals Combo",
+                "description": "Traditional vegetarian meal combo",
+                "price": 150,
+                "rating": 4.4,
+                "ingredients": ["rice", "sambar", "rasam", "poriyal", "payasam"],
+                "image": "https://i.pinimg.com/1200x/ec/ac/38/ecac38f46bc461161c414679acb7700c.jpg"
+              }
+            ]
+          },
+          {
+           
+            "name": "Curry Rice",
+            "description": "Traditional fish curry with Kerala red rice",
+            "category": "Non-Veg Meal",
+            "price": 250,
+            "rating": 4.8,
+            "ingredients": ["chicken", "spices", "rice"],
+            "image": "https://i.pinimg.com/1200x/7f/4b/09/7f4b0981581bff257194e048da66274e.jpg",
+            "varieties": [
+              {
+               
+                "name": "Chicken Curry Rice",
+                "description": "Spicy chicken curry with rice",
+                "price": 220,
+                "rating": 4.7,
+                "ingredients": ["chicken", "spices", "rice"],
+                "image": "https://i.pinimg.com/1200x/7f/4b/09/7f4b0981581bff257194e048da66274e.jpg"
+              },
+              {
+              
+                "name": "Mutton Briyani",
+                "description": "Basmati with mutton",
+                "price": 220,
+                "rating": 4.7,
+                "ingredients": ["Mutton", "spices", "rice"],
+                "image": "https://i.pinimg.com/1200x/7f/4b/09/7f4b0981581bff257194e048da66274e.jpg"
+              },
+              {
+                "id": 3,
+                "name": "Chicken Curry Rice",
+                "description": "Spicy chicken curry with rice",
+                "price": 220,
+                "rating": 4.7,
+                "ingredients": ["chicken", "spices", "rice"],
+                "image": "https://i.pinimg.com/1200x/7f/4b/09/7f4b0981581bff257194e048da66274e.jpg"
+              },
+              {
+                "id": 4,
+                "name": "Chicken Curry Rice",
+                "description": "Spicy chicken curry with rice",
+                "price": 220,
+                "rating": 4.7,
+                "ingredients": ["chicken", "spices", "rice"],
+                "image": "https://i.pinimg.com/1200x/7f/4b/09/7f4b0981581bff257194e048da66274e.jpg"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Dinner",
+        "items": [
+          {
+            "id": 1,
+            "name": "Noodles",
+            "description": "Stir-fried noodles with fresh vegetables Chinese spices",
+            "category": "Chinese",
+            "price": 190,
+            "rating": 4.3,
+            "ingredients": ["basmati rice", "vegetables", "biryani masala", "cashew"],
+            "image": "https://i.pinimg.com/736x/cc/0e/c6/cc0ec678549698920af1632150a0e361.jpg",
+            "varieties": [
+              {
+                "id": 1,
+                "name": "Veg Hakka Noodles",
+                "description": "Stir-fried noodles with vegetables",
+                "price": 160,
+                "rating": 4.3,
+                "ingredients": ["noodles", "vegetables", "soy sauce", "spring onion"],
+                "image": "https://i.pinimg.com/736x/cc/0e/c6/cc0ec678549698920af1632150a0e361.jpg"
+              },
+              {
+                "id": 2,
+                "name": "Chilli Garlic Noodles",
+                "description": "Stir-fried noodles with vegetables",
+                "price": 160,
+                "rating": 4.3,
+                "ingredients": ["noodles", "vegetables", "soy sauce", "spring onion"],
+                "image": "https://i.pinimg.com/736x/94/ec/6d/94ec6d13cf070fb528ab2705f6f42b32.jpg"
+              },
+              {
+                "id": 3,
+                "name": " Chicken Noodles",
+                "description": "Stir-fried noodles with vegetables",
+                "price": 160,
+                "rating": 4.3,
+                "ingredients": ["noodles", "vegetables", "soy sauce", "spring onion"],
+                "image": "https://i.pinimg.com/1200x/a9/95/a3/a995a39c4028de122f6064a80fde4645.jpg"
+              },
+              {
+                "id": 4,
+                "name": "Korean Gochujang Noodles",
+                "description": "Stir-fried noodles with vegetables",
+                "price": 160,
+                "rating": 4.3,
+                "ingredients": ["noodles", "vegetables", "soy sauce", "spring onion"],
+                "image": "https://i.pinimg.com/736x/5e/9c/21/5e9c21832327661986eaae9f82a9f2ad.jpg"
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "name": "Chapati",
+            "description": "Soft chapatis with vegetable curry with vegetables",
+            "category": "North Indian",
+            "price": 120,
+            "rating": 4.2,
+            "ingredients": ["wheat flour", "vegetables", "spices", "oil"],
+            "image": "https://i.pinimg.com/1200x/ee/a9/c7/eea9c7392d2ff8007c7c52ee62d05245.jpg",
+            "varieties": [
+              {
+                "id": 1,
+                "name": "Chapati with Veg Curry",
+                "description": "Soft chapatis with vegetable curry",
+                "price": 120,
+                "rating": 4.2,
+                "ingredients": ["wheat flour", "vegetables", "spices", "oil"],
+                "image": "https://i.pinimg.com/1200x/ee/a9/c7/eea9c7392d2ff8007c7c52ee62d05245.jpg"
+              },
+               {
+                "id": 2,
+                "name": "Palak Chapati",
+                "description": "Soft chapatis with vegetable curry",
+                "price": 120,
+                "rating": 4.2,
+                "ingredients": ["wheat flour", "vegetables", "spices", "oil"],
+                "image": "https://i.pinimg.com/736x/3a/80/07/3a8007025c0afffdac868852d94c3954.jpg"
+              },
+               {
+                "id": 3,
+                "name": "Chapati Roll",
+                "description": "Soft chapatis with vegetable curry",
+                "price": 120,
+                "rating": 4.2,
+                "ingredients": ["wheat flour", "vegetables", "spices", "oil"],
+                "image": "https://i.pinimg.com/736x/fd/6d/a9/fd6da944c3f79148b69f409034d07f91.jpg"
+              },
+               {
+                "id": 4,
+                "name": "Chapati noodles",
+                "description": "Soft chapatis with vegetable curry",
+                "price": 120,
+                "rating": 4.2,
+                "ingredients": ["wheat flour", "vegetables", "spices", "oil"],
+                "image": "https://i.pinimg.com/736x/81/16/d9/8116d986cc8303f901a41df9f50e6974.jpg"
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "name": "Fried Rice",
+            "description": "Chinese style fried rice with vegetables",
+            "category": "Chinese",
+            "price": 160,
+            "rating": 4.4,
+            "ingredients": ["rice", "vegetables", "soy sauce", "spring onion"],
+            "image": "https://i.pinimg.com/736x/f5/12/11/f512117739494fb07f15f90d38d2cc1b.jpg",
+            "varieties": [
+              {
+                "id": 1,
+                "name": "Veg Fried Rice",
+                "description": "Chinese style fried rice with vegetables",
+                "price": 160,
+                "rating": 4.4,
+                "ingredients": ["rice", "vegetables", "soy sauce", "spring onion"],
+                "image": "https://i.pinimg.com/736x/f5/12/11/f512117739494fb07f15f90d38d2cc1b.jpg"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Desert",
+        "items": [
+          {
+            "id": 1,
+            "name": "Sweets",
+            "description": "Soft milk balls in sugar syrup",
+            "category": "Sweet",
+            "price": 80,
+            "rating": 4.6,
+            "ingredients": ["milk powder", "sugar", "flour"],
+            "image": "https://i.pinimg.com/736x/4c/66/3d/4c663ddd5dccef3886364a9901733c96.jpg",
+            "varieties": [
+              {
+                "id": 1,
+                "name": "Gulab Jamun",
+                "description": "Soft milk balls in sugar syrup",
+                "price": 80,
+                "rating": 4.6,
+                "ingredients": ["milk powder", "sugar", "flour", "cardamom"],
+                "image": "https://i.pinimg.com/736x/4c/66/3d/4c663ddd5dccef3886364a9901733c96.jpg"
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "name": "Payasam",
+            "description": "Traditional South Indian sweet",
+            "category": "Sweet",
+            "price": 70,
+            "rating": 4.5,
+            "ingredients": ["rice", "milk", "sugar", "dry fruits"],
+            "image": "https://i.pinimg.com/1200x/a9/2e/14/a92e1453635deb19ea85cb3916a0eb3e.jpg",
+            "varieties": [
+              {
+                "id": 1,
+                "name": "Rice Payasam",
+                "description": "Traditional rice payasam with dry fruits",
+                "price": 70,
+                "rating": 4.5,
+                "ingredients": ["rice", "milk", "sugar", "dry fruits"],
+                "image": "https://i.pinimg.com/1200x/a9/2e/14/a92e1453635deb19ea85cb3916a0eb3e.jpg"
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "name": "Ice Cream",
+            "description": "Creamy vanilla ice cream",
+            "category": "Frozen",
+            "price": 90,
+            "rating": 4.3,
+            "ingredients": ["milk", "cream", "sugar", "vanilla"],
+            "image": "https://i.pinimg.com/736x/11/c0/90/11c090285c6c8d42f8bf83092ef83368.jpg",
+            "varieties": [
+              {
+                "id": 1,
+                "name": "Vanilla Ice Cream",
+                "description": "Creamy vanilla ice cream",
+                "price": 90,
+                "rating": 4.3,
+                "ingredients": ["milk", "cream", "sugar", "vanilla"],
+                "image": "https://i.pinimg.com/736x/11/c0/90/11c090285c6c8d42f8bf83092ef83368.jpg"
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "name": "Cake",
+            "description": "Rich chocolate cake slice",
+            "category": "Bakery",
+            "price": 110,
+            "rating": 4.7,
+            "ingredients": ["flour", "chocolate", "sugar", "eggs", "butter"],
+            "image": "https://i.pinimg.com/1200x/f2/e0/24/f2e024b403b73d4396874388bdb6acd1.jpg",
+            "varieties": [
+              {
+                "id": 1,
+                "name": "Chocolate Cake",
+                "description": "Rich chocolate cake slice",
+                "price": 110,
+                "rating": 4.7,
+                "ingredients": ["flour", "chocolate", "sugar", "eggs", "butter"],
+                "image": "https://i.pinimg.com/1200x/f2/e0/24/f2e024b403b73d4396874388bdb6acd1.jpg"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "Drinks",
+        "items": [
+          {
+            "id": 1,
+            "name": "Lassi",
+            "description": "Refreshing yogurt based drink",
+            "category": "Yogurt Drink",
+            "price": 60,
+            "rating": 4.6,
+            "ingredients": ["yogurt", "mango", "sugar", "cardamom"],
+            "image": "https://i.pinimg.com/736x/ed/4f/17/ed4f170934a6903610456c6c263911d8.jpg",
+            "varieties": [
+              {
+                "id": 1,
+                "name": "Mango Lassi",
+                "description": "Refreshing yogurt based mango drink",
+                "price": 60,
+                "rating": 4.6,
+                "ingredients": ["yogurt", "mango", "sugar", "cardamom"],
+                "image": "https://i.pinimg.com/736x/ed/4f/17/ed4f170934a6903610456c6c263911d8.jpg"
+              }
+            ]
+          },
+          {
+            "id": 2,
+            "name": "Soda",
+            "description": "Cooling soda",
+            "category": "Cool Drink",
+            "price": 40,
+            "rating": 4.2,
+            "ingredients": ["soda", "sugar", "mint"],
+            "image": "https://i.pinimg.com/736x/c7/6f/e3/c76fe38d99b408ac55951da721e024cc.jpg",
+            "varieties": [
+              {
+                "id": 1,
+                "name": "Fresh Lime Soda",
+                "description": "Cooling lime soda with mint",
+                "price": 40,
+                "rating": 4.2,
+                "ingredients": ["soda", "lime", "sugar", "mint"],
+                "image": "https://i.pinimg.com/736x/c7/6f/e3/c76fe38d99b408ac55951da721e024cc.jpg"
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "name": "Chai",
+            "description": "Traditional Indian spiced tea",
+            "category": "Hot Drink",
+            "price": 30,
+            "rating": 4.5,
+            "ingredients": ["tea leaves", "milk", "ginger", "cardamom"],
+            "image": "https://i.pinimg.com/736x/ab/3e/b0/ab3eb016e4694959cbc1d1aa6ea20bf2.jpg",
+            "varieties": [
+              {
+                "id": 1,
+                "name": "Masala Chai",
+                "description": "Traditional Indian spiced tea",
+                "price": 30,
+                "rating": 4.5,
+                "ingredients": ["tea leaves", "milk", "ginger", "cardamom"],
+                "image": "https://i.pinimg.com/736x/ab/3e/b0/ab3eb016e4694959cbc1d1aa6ea20bf2.jpg"
+              }
+            ]
+          },
+          {
+            "id": 4,
+            "name": "Coffee",
+            "description": "Chilled coffee with ice cream",
+            "category": "Drink",
+            "price": 80,
+            "rating": 4.4,
+            "ingredients": ["coffee", "milk", "sugar", "ice cream"],
+            "image": "https://i.pinimg.com/736x/a0/5a/6a/a05a6a68e9174152ce1ad1424ae5f735.jpg",
+            "varieties": [
+              {
+                "id": 1,
+                "name": "Filter Coffee",
+                "description": "Strong South Indian filter coffee",
+                "price": 40,
+                "rating": 4.6,
+                "ingredients": ["coffee powder", "milk", "sugar"],
+                "image": "https://i.pinimg.com/736x/a0/5a/6a/a05a6a68e9174152ce1ad1424ae5f735.jpg"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
