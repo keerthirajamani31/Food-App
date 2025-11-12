@@ -47,88 +47,16 @@ const VarietiesPage = ({ currentItem, onViewDetails, onAddToCart }) => {
         </div>
         
         {varieties.length > 0 ? (
-          <div className="grid grid-cols-1 gap-4 sm:gap-6">
+          // UPDATED: 2 columns on all screen sizes
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             {varieties.map((variety) => (
-              <div 
+              <VarietyCard 
                 key={variety._id}
-                className="bg-white rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100"
-              >
-                <div className="flex flex-col sm:flex-row h-full">
-                  <div className="sm:w-2/5 h-48 sm:h-56 md:h-auto overflow-hidden">
-                    <img
-                      src={variety.image}
-                      alt={variety.name}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-
-                  <div className="sm:w-3/5 p-4 sm:p-6 flex flex-col justify-between">
-                    <div>
-                      <div className="flex justify-between items-start mb-2 sm:mb-3">
-                        <h3 className="text-lg sm:text-xl font-bold text-gray-800 font-serif line-clamp-1">
-                          {variety.name}
-                        </h3>
-                        <div className="flex flex-col items-end gap-1">
-                          <span className="bg-amber-100 text-amber-800 text-xs font-medium px-2 py-1 rounded-full">
-                            {currentItem.name}
-                          </span>
-                          <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-bold">
-                            ⭐ {variety.rating}
-                          </span>
-                        </div>
-                      </div>
-
-                      <p className="text-gray-600 mb-3 sm:mb-4 leading-relaxed text-xs sm:text-sm line-clamp-2">
-                        {variety.description}
-                      </p>
-
-                      {variety.ingredients && (
-                        <div className="mb-3 sm:mb-4">
-                          <p className="text-xs text-gray-500 font-semibold mb-1 sm:mb-2">Key Ingredients:</p>
-                          <div className="flex flex-wrap gap-1">
-                            {variety.ingredients.slice(0, 3).map((ingredient, idx) => (
-                              <span 
-                                key={idx}
-                                className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs"
-                              >
-                                {ingredient}
-                              </span>
-                            ))}
-                            {variety.ingredients.length > 3 && (
-                              <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs">
-                                +{variety.ingredients.length - 3} more
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex items-center justify-between pt-3 sm:pt-4 border-t border-gray-100">
-                      <div>
-                        <span className="text-xl sm:text-2xl font-bold text-green-600">
-                          ₹{variety.price}
-                        </span>
-                        <span className="text-xs text-gray-500 block">per serving</span>
-                      </div>
-                      <div className="flex gap-2">
-                        <button 
-                          onClick={() => onViewDetails(variety)}
-                          className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-1 sm:py-2 px-2 sm:px-4 rounded-lg transition-all duration-200 text-xs sm:text-sm border border-gray-300"
-                        >
-                          Details
-                        </button>
-                        <button 
-                          onClick={() => onAddToCart(variety)}
-                          className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold py-1 sm:py-2 px-2 sm:px-4 rounded-lg transition-all duration-300 transform hover:scale-105 text-xs sm:text-sm"
-                        >
-                          Add to Cart
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                variety={variety}
+                currentItem={currentItem}
+                onViewDetails={onViewDetails}
+                onAddToCart={onAddToCart}
+              />
             ))}
           </div>
         ) : (
@@ -146,5 +74,84 @@ const VarietiesPage = ({ currentItem, onViewDetails, onAddToCart }) => {
     </div>
   )
 }
+
+// New VarietyCard component for better organization
+const VarietyCard = ({ variety, currentItem, onViewDetails, onAddToCart }) => (
+  <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100">
+    <div className="flex flex-col h-full">
+      <div className="h-48 sm:h-56 overflow-hidden">
+        <img
+          src={variety.image}
+          alt={variety.name}
+          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+        />
+      </div>
+
+      <div className="p-4 sm:p-6 flex flex-col flex-1">
+        <div className="flex justify-between items-start mb-3">
+          <h3 className="text-lg sm:text-xl font-bold text-gray-800 font-serif line-clamp-1 flex-1 mr-2">
+            {variety.name}
+          </h3>
+          <div className="flex flex-col items-end gap-1 flex-shrink-0">
+            <span className="bg-amber-100 text-amber-800 text-xs font-medium px-2 py-1 rounded-full whitespace-nowrap">
+              {currentItem.name}
+            </span>
+            <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-bold whitespace-nowrap">
+              ⭐ {variety.rating}
+            </span>
+          </div>
+        </div>
+
+        <p className="text-gray-600 mb-4 leading-relaxed text-sm line-clamp-2 flex-1">
+          {variety.description}
+        </p>
+
+        {variety.ingredients && (
+          <div className="mb-4">
+            <p className="text-xs text-gray-500 font-semibold mb-2">Key Ingredients:</p>
+            <div className="flex flex-wrap gap-1">
+              {variety.ingredients.slice(0, 3).map((ingredient, idx) => (
+                <span 
+                  key={idx}
+                  className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs"
+                >
+                  {ingredient}
+                </span>
+              ))}
+              {variety.ingredients.length > 3 && (
+                <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs">
+                  +{variety.ingredients.length - 3} more
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+
+        <div className="flex items-center justify-between pt-4 border-t border-gray-100 mt-auto">
+          <div>
+            <span className="text-xl sm:text-2xl font-bold text-green-600">
+              ₹{variety.price}
+            </span>
+            <span className="text-xs text-gray-500 block">per serving</span>
+          </div>
+          <div className="flex gap-2">
+            <button 
+              onClick={() => onViewDetails(variety)}
+              className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2 px-3 sm:px-4 rounded-lg transition-all duration-200 text-xs sm:text-sm border border-gray-300 whitespace-nowrap"
+            >
+              Details
+            </button>
+            <button 
+              onClick={() => onAddToCart(variety)}
+              className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-bold py-2 px-3 sm:px-4 rounded-lg transition-all duration-300 transform hover:scale-105 text-xs sm:text-sm whitespace-nowrap"
+            >
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+)
 
 export default VarietiesPage
