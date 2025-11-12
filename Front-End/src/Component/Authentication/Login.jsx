@@ -31,34 +31,35 @@ const Login = () => {
     }
 
     try {
+      console.log('🔄 Attempting login with:', formData.username);
+      
       const API_BASE_URL = 'https://food-app-fshp.onrender.com';
       
-      const usersResponse = await fetch(`${API_BASE_URL}/api/users/all`, {
-        method: 'GET',
+      // Try direct login endpoint first
+      const loginResponse = await fetch(`${API_BASE_URL}/api/users/login`, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          username: formData.username,
+          password: formData.password
+        }),
       });
 
-      if (!usersResponse.ok) {
-        throw new Error('Server error');
-      }
+      console.log('📡 Login response status:', loginResponse.status);
 
-      const usersData = await usersResponse.json();
-
-      if (usersData.success && usersData.users) {
-        const user = usersData.users.find(u => 
-          u.username === formData.username && 
-          u.password === formData.password
-        );
+      if (loginResponse.ok) {
+        const data = await loginResponse.json();
+        console.log('✅ Login successful:', data);
         
-        if (user) {
+        if (data.success) {
           const userInfo = {
-            id: user._id || user.id,
-            fullName: user.fullName,
-            username: user.username,
-            emailAddress: user.emailAddress,
-            phoneNumber: user.phoneNumber,
+            id: data.user._id || data.user.id,
+            fullName: data.user.fullName || data.user.username,
+            username: data.user.username,
+            emailAddress: data.user.emailAddress || data.user.email,
+            phoneNumber: data.user.phoneNumber || data.user.phone,
             isLoggedIn: true,
             loginTime: new Date().toISOString()
           };
@@ -71,14 +72,71 @@ const Login = () => {
           });
           window.dispatchEvent(loginEvent);
           
-          alert(`Welcome back, ${user.fullName || user.username}!`);
+          alert(`Welcome back, ${userInfo.fullName || userInfo.username}!`);
           navigate('/menu');
-        } else {
-          setError('Invalid username or password!');
+          return;
         }
       }
+
+      // If login endpoint fails, try getting all users and checking manually
+      console.log('🔄 Login endpoint failed, trying manual check...');
+      
+      const usersResponse = await fetch(`${API_BASE_URL}/api/users/all`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!usersResponse.ok) {
+        throw new Error('Failed to fetch users');
+      }
+
+      const usersData = await usersResponse.json();
+      console.log('📦 Users data:', usersData);
+
+      if (usersData.success && usersData.users) {
+        const user = usersData.users.find(u => 
+          u.username === formData.username && 
+          u.password === formData.password
+        );
+        
+        if (user) {
+          const userInfo = {
+            id: user._id || user.id,
+            fullName: user.fullName || user.username,
+            username: user.username,
+            emailAddress: user.emailAddress || user.email,
+            phoneNumber: user.phoneNumber || user.phone,
+            isLoggedIn: true,
+            loginTime: new Date().toISOString()
+          };
+          
+          localStorage.setItem('user', JSON.stringify(userInfo));
+          localStorage.setItem('isLoggedIn', 'true');
+          
+          const loginEvent = new CustomEvent('userLoggedIn', { 
+            detail: userInfo 
+          });
+          window.dispatchEvent(loginEvent);
+          
+          alert(`Welcome back, ${userInfo.fullName || userInfo.username}!`);
+          navigate('/menu');
+        } else {
+          const userExists = usersData.users.find(u => u.username === formData.username);
+          if (userExists) {
+            setError('Invalid password! Please check your password.');
+          } else {
+            setError('User not found! Please register first.');
+          }
+        }
+      } else {
+        throw new Error('Invalid response from server');
+      }
+
     } catch (error) {
-      setError('Login failed. Please try again.');
+      console.error('❌ Login error:', error);
+      setError('Login failed. Please check your credentials and try again.');
     } finally {
       setLoading(false);
     }
