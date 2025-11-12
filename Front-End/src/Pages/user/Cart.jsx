@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+ import React, { useState, useEffect } from 'react';
 import { FaTrash, FaPlus, FaMinus, FaShoppingCart, FaArrowLeft, FaUser } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 
