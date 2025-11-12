@@ -17,11 +17,12 @@ const Login = () => {
   // Detect mobile on component mount
   React.useEffect(() => {
     const checkMobile = () => {
-      const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      const mobile = window.innerWidth <= 768;
       setIsMobile(mobile);
-      console.log('📱 Mobile detected:', mobile);
     };
     checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   const handleInputChange = (e) => {
@@ -42,11 +43,11 @@ const Login = () => {
     }
 
     try {
-      console.log('🔄 Attempting normal login...');
+      console.log('🔄 Attempting login...');
       
       const API_BASE_URL = 'https://food-app-fshp.onrender.com';
       
-      // Get all users to validate credentials
+      // Get all users
       const usersResponse = await fetch(`${API_BASE_URL}/api/users/all`, {
         method: 'GET',
         headers: {
@@ -62,13 +63,13 @@ const Login = () => {
       }
 
       const usersData = await usersResponse.json();
-      console.log('📦 Users data received:', usersData);
+      console.log('📦 Users data received');
 
       if (usersData.success && usersData.users) {
-        // Find user with matching username AND password
+        // FIXED: Check both username AND password
         const user = usersData.users.find(u => 
           u.username === formData.username && 
-          u.password === formData.password // Direct password comparison (since it's plain text in your DB)
+          u.password === formData.password
         );
         
         if (user) {
@@ -93,11 +94,11 @@ const Login = () => {
           window.dispatchEvent(loginEvent);
           window.dispatchEvent(new Event('storage'));
           
-          console.log('✅ Normal login successful');
+          console.log('✅ Login successful');
           alert(`Welcome back, ${user.fullName || user.username}!`);
           navigate('/menu');
         } else {
-          // Check if username exists but password is wrong
+          // FIXED: Better error message
           const userExists = usersData.users.find(u => u.username === formData.username);
           if (userExists) {
             setError('Invalid password! Please check your password.');
@@ -128,12 +129,11 @@ const Login = () => {
           setError(error.message || 'Server error. Please try again.');
         }
       }
-    } finally {
       setLoading(false);
     }
   };
 
-  // Enhanced demo login
+  // Demo login
   const handleDemoLogin = async () => {
     setLoading(true);
     setError('');
@@ -178,7 +178,6 @@ const Login = () => {
           detail: userInfo 
         });
         window.dispatchEvent(loginEvent);
-        window.dispatchEvent(new Event('storage'));
         
         console.log('✅ Demo login successful');
         alert(`Welcome, ${data.user.name}! (Demo Mode)`);
@@ -217,19 +216,10 @@ const Login = () => {
       detail: mockUser 
     });
     window.dispatchEvent(loginEvent);
-    window.dispatchEvent(new Event('storage'));
     
     console.log('✅ Fallback login successful');
     alert(`Welcome, ${mockUser.fullName}! (Fallback Mode)`);
     navigate('/menu');
-  };
-
-  // Quick test credentials for development
-  const handleTestCredentials = (username, password) => {
-    setFormData({
-      username: username,
-      password: password
-    });
   };
 
   const handleCreateAccount = () => {
@@ -279,7 +269,7 @@ const Login = () => {
         )}
         
         <div className='relative mb-5 text-amber-500'>
-          <LuUserRoundPen size={20} className='absolute left-3 items-center top-1/2 transform -translate-y-1/2'/>
+          <LuUserRoundPen size={20} className='absolute left-3 top-1/2 transform -translate-y-1/2'/>
           <input 
             type='text' 
             name="username"
@@ -292,7 +282,7 @@ const Login = () => {
         </div>
         
         <div className='relative mb-5 text-amber-500'>
-          <FaLock size={20} className='absolute left-3 items-center top-1/2 transform -translate-y-1/2'/>
+          <FaLock size={20} className='absolute left-3 top-1/2 transform -translate-y-1/2'/>
           <input 
             type='password' 
             name="password"
@@ -323,29 +313,6 @@ const Login = () => {
           </button>
         </div>
 
-        {/* Test Credentials for Development */}
-        <div className='mb-4 space-y-2'>
-          <div className='text-center'>
-            <p className='text-amber-300 text-sm mb-2'>Test Credentials:</p>
-            <div className='flex gap-2 justify-center'>
-              <button 
-                type="button"
-                onClick={() => handleTestCredentials('john_doe', 'password123')}
-                className="bg-blue-600 text-white text-xs px-3 py-1 rounded hover:bg-blue-700 transition-colors"
-              >
-                John Doe
-              </button>
-              <button 
-                type="button"
-                onClick={() => handleTestCredentials('jane_smith', 'password123')}
-                className="bg-purple-600 text-white text-xs px-3 py-1 rounded hover:bg-purple-700 transition-colors"
-              >
-                Jane Smith
-              </button>
-            </div>
-          </div>
-        </div>
-
         {/* Demo Login Buttons */}
         <div className='mb-4 space-y-2'>
           <button 
@@ -366,14 +333,15 @@ const Login = () => {
           </button>
         </div>
         
-        <div className='relative flex'>
-          <FaUserPlus size={20} className='text-amber-500 absolute left-25 items-center top-1/2 transform -translate-y-1/2 hover:text-amber-700' />
+        {/* FIXED: Create Account Button - Better mobile layout */}
+        <div className='relative mb-4'>
           <button 
             type="button"
             onClick={handleCreateAccount}
-            className='w-full text-amber-500 cursor-pointer hover:text-amber-700 font-serif text-lg'
+            className='w-full text-amber-500 cursor-pointer hover:text-amber-700 font-serif text-lg py-3 flex items-center justify-center gap-2'
           >
-            Create New Account
+            <FaUserPlus size={20} className='flex-shrink-0' />
+            <span>Create New Account</span>
           </button>
         </div>
 
