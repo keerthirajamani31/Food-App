@@ -13,18 +13,18 @@ const MenuItemCard = ({ item, theme = 'light' }) => {
     }
   `
 
-  const titleClasses = `text-xl font-bold ${isDark ? 'text-amber-100' : 'text-gray-800'}`
-  const descriptionClasses = `mb-4 leading-relaxed ${isDark ? 'text-amber-200 text-sm' : 'text-gray-600'}`
-  const ratingClasses = `px-2 py-1 rounded text-sm ${
+  const titleClasses = `font-bold ${isDark ? 'text-amber-100' : 'text-gray-800'} text-sm sm:text-base md:text-xl line-clamp-1`
+  const descriptionClasses = `leading-relaxed ${isDark ? 'text-amber-200' : 'text-gray-600'} text-xs sm:text-sm line-clamp-2`
+  const ratingClasses = `px-2 py-1 rounded text-xs ${
     isDark 
-      ? 'bg-yellow-500/20 text-yellow-300 rounded-full text-xs font-bold' 
+      ? 'bg-yellow-500/20 text-yellow-300 rounded-full font-bold' 
       : 'bg-yellow-100 text-yellow-800'
   }`
-  const ctaClasses = `text-center font-semibold py-2 border-t pt-4 ${
+  const ctaClasses = `text-center font-semibold py-2 border-t pt-3 ${
     isDark 
       ? 'text-orange-300 border-amber-800/30' 
       : 'text-orange-500 border-gray-200'
-  }`
+  } text-xs sm:text-sm`
 
   const handleClick = () => {
     console.log('MenuItemCard clicked:', item.name)
@@ -48,7 +48,7 @@ const MenuItemCard = ({ item, theme = 'light' }) => {
       className={cardClasses}
       onClick={handleClick}
     >
-      <div className="h-56 overflow-hidden">
+      <div className="h-32 sm:h-40 md:h-56 overflow-hidden">
         <img
           src={item.image}
           alt={item.name}
@@ -56,8 +56,8 @@ const MenuItemCard = ({ item, theme = 'light' }) => {
         />
       </div>
 
-      <div className="p-6">
-        <div className="flex justify-between items-start mb-3 gap-3">
+      <div className="p-3 sm:p-4 md:p-6">
+        <div className="flex justify-between items-start mb-2 sm:mb-3 gap-2">
           <h3 className={titleClasses}>{item.name}</h3>
           <span className={ratingClasses}>
             ⭐ {item.rating}

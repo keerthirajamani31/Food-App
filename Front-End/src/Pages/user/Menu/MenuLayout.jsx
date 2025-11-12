@@ -11,11 +11,11 @@ const MenuLayout = ({ allItems }) => {
 
   return (
     <div>
-      <div className='bg-gradient-to-br from-[#1a120b] via-[#2a1e1e] to-[#3e2b1d] min-h-screen justify-items-center'>
-        <div className='py-16 px-4 sm:px-6 lg:px-8 '>
-          <h2 className='font-serif italic text-4xl text-amber-500 text-center'>Our Exquisite Menu</h2>
+      <div className='bg-gradient-to-br from-[#1a120b] via-[#2a1e1e] to-[#3e2b1d] min-h-screen'>
+        <div className='py-8 sm:py-16 px-4 sm:px-6 lg:px-8'>
+          <h2 className='font-serif italic text-2xl sm:text-4xl text-amber-500 text-center'>Our Exquisite Menu</h2>
         </div>
-        <span className='font-serif font-bold text-white text-3xl sm:text-6xl md:text-4xl block text-center'>A SYMPHONY OF FLAVOURS</span>
+        <span className='font-serif font-bold text-white text-xl sm:text-3xl md:text-4xl lg:text-6xl block text-center px-4'>A SYMPHONY OF FLAVOURS</span>
         
         <CategoryNavigation />
         
@@ -26,34 +26,34 @@ const MenuLayout = ({ allItems }) => {
 }
 
 const CategoryNavigation = () => (
-  <div className='flex flex-wrap justify-center gap-4 p-7 text-white '>
-    <Link to="/menu/breakfast">
-      <button className='bg-amber-900/20 border-2 border-amber-800/30 text-amber-100/80 hover:bg-amber-800/40 font-serif px-4 sm:px-6 py-2 rounded-full text-lg transition-all duration-300'>BREAKFAST</button>
+  <div className='flex flex-wrap justify-center gap-2 sm:gap-4 p-4 sm:p-7 text-white'>
+    <Link to="/menu/breakfast" className="w-[45%] sm:w-auto">
+      <button className='w-full bg-amber-900/20 border-2 border-amber-800/30 text-amber-100/80 hover:bg-amber-800/40 font-serif px-3 sm:px-6 py-2 rounded-full text-sm sm:text-lg transition-all duration-300 whitespace-nowrap'>BREAKFAST</button>
     </Link>
-    <Link to="/menu/lunch">
-      <button className='bg-amber-900/20 border-2 border-amber-800/30 text-amber-100/80 hover:bg-amber-800/40 font-serif px-4 sm:px-6 py-2 rounded-full text-lg'>LUNCH</button>
+    <Link to="/menu/lunch" className="w-[45%] sm:w-auto">
+      <button className='w-full bg-amber-900/20 border-2 border-amber-800/30 text-amber-100/80 hover:bg-amber-800/40 font-serif px-3 sm:px-6 py-2 rounded-full text-sm sm:text-lg whitespace-nowrap'>LUNCH</button>
     </Link>
-    <Link to="/menu/dinner">
-      <button className='bg-amber-900/20 border-2 border-amber-800/30 text-amber-100/80 hover:bg-amber-800/40 font-serif px-4 sm:px-6 py-2 rounded-full text-lg'>DINNER</button>
+    <Link to="/menu/dinner" className="w-[45%] sm:w-auto">
+      <button className='w-full bg-amber-900/20 border-2 border-amber-800/30 text-amber-100/80 hover:bg-amber-800/40 font-serif px-3 sm:px-6 py-2 rounded-full text-sm sm:text-lg whitespace-nowrap'>DINNER</button>
     </Link>
-    <Link to="/menu/dessert">
-      <button className='bg-amber-900/20 border-2 border-amber-800/30 text-amber-100/80 hover:bg-amber-800/40 font-serif px-4 sm:px-6 py-2 rounded-full text-lg'>DESSERT</button>
+    <Link to="/menu/dessert" className="w-[45%] sm:w-auto">
+      <button className='w-full bg-amber-900/20 border-2 border-amber-800/30 text-amber-100/80 hover:bg-amber-800/40 font-serif px-3 sm:px-6 py-2 rounded-full text-sm sm:text-lg whitespace-nowrap'>DESSERT</button>
     </Link>
-    <Link to="/menu/drinks">
-      <button className='bg-amber-900/20 border-2 border-amber-800/30 text-amber-100/80 hover:bg-amber-800/40 font-serif px-4 sm:px-6 py-2 rounded-full text-lg'>DRINKS</button>
+    <Link to="/menu/drinks" className="w-[45%] sm:w-auto">
+      <button className='w-full bg-amber-900/20 border-2 border-amber-800/30 text-amber-100/80 hover:bg-amber-800/40 font-serif px-3 sm:px-6 py-2 rounded-full text-sm sm:text-lg whitespace-nowrap'>DRINKS</button>
     </Link>
   </div>
 )
 
 const FeaturedSection = ({ items }) => (
-  <div className="bg-white/10 backdrop-blur-sm mx-4 mb-8 rounded-2xl p-8 border border-amber-800/30">
-    <div className="text-center mb-8">
-      <h1 className="text-4xl font-bold text-amber-100 capitalize font-serif">
+  <div className="bg-white/10 backdrop-blur-sm mx-2 sm:mx-4 mb-8 rounded-2xl p-4 sm:p-8 border border-amber-800/30">
+    <div className="text-center mb-6 sm:mb-8">
+      <h1 className="text-2xl sm:text-4xl font-bold text-amber-100 capitalize font-serif">
         Breakfast Menu
       </h1>
     </div>
     
-    <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'>
+    <div className='grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6'>
       {items.map((item) => (
         <MenuItemCard 
           key={item._id} 
@@ -64,8 +64,8 @@ const FeaturedSection = ({ items }) => (
     </div>
 
     {items.length === 0 && (
-      <div className="text-center py-12">
-        <p className="text-amber-200 text-xl">No breakfast items available</p>
+      <div className="text-center py-8 sm:py-12">
+        <p className="text-amber-200 text-lg sm:text-xl">No breakfast items available</p>
       </div>
     )}
   </div>

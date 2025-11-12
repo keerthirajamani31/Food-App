@@ -182,13 +182,13 @@ const Menu = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-red-600 mb-4">Connection Error</h2>
-          <p className="text-gray-600 mb-4">{error}</p>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="text-center max-w-md">
+          <h2 className="text-xl sm:text-2xl font-bold text-red-600 mb-4">Connection Error</h2>
+          <p className="text-gray-600 mb-4 text-sm sm:text-base">{error}</p>
           <button 
             onClick={() => window.location.reload()} 
-            className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg"
+            className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg text-sm sm:text-base"
           >
             Retry
           </button>
@@ -205,13 +205,13 @@ const Menu = () => {
 
     if (!currentItem) {
       return (
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-red-600 mb-4">Item Not Found</h2>
-            <p className="text-gray-600">"{decodedItemName}" not found in menu</p>
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+          <div className="text-center max-w-md">
+            <h2 className="text-xl sm:text-2xl font-bold text-red-600 mb-4">Item Not Found</h2>
+            <p className="text-gray-600 text-sm sm:text-base">"{decodedItemName}" not found in menu</p>
             <button 
               onClick={() => window.history.back()}
-              className="mt-4 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg"
+              className="mt-4 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2 px-4 rounded-lg text-sm sm:text-base"
             >
               Go Back
             </button>
