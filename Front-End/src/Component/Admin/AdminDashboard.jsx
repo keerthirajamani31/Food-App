@@ -8,6 +8,7 @@ const AdminDashboard = () => {
   const [menuItems, setMenuItems] = useState([]);
   const [orders, setOrders] = useState([]);
   const [customers, setCustomers] = useState([]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Load menu items
   useEffect(() => {
@@ -202,31 +203,38 @@ const AdminDashboard = () => {
   const Dashboard = () => {
     return (
       <>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {/* Mobile Header */}
+        <div className="lg:hidden bg-amber-700 text-white p-4 mb-6 rounded-lg">
+          <h1 className="text-xl font-bold">Admin Dashboard</h1>
+          <p className="text-amber-100 text-sm">Welcome to Foodie-Bazar Admin</p>
+        </div>
+
+        {/* Stats Grid - Mobile Responsive */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
           {/* Total Revenue */}
-          <div className="bg-white p-6 rounded-lg shadow border border-green-200">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow border border-green-200">
             <div className="flex items-center">
-              <div className="p-3 bg-green-100 rounded-lg">
-                <span className="text-2xl">💰</span>
+              <div className="p-2 sm:p-3 bg-green-100 rounded-lg">
+                <span className="text-xl sm:text-2xl">💰</span>
               </div>
-              <div className="ml-4">
-                <p className="text-sm text-gray-600">Total Revenue</p>
-                <p className="text-2xl font-bold text-green-800">₹{stats.totalRevenue}</p>
+              <div className="ml-3 sm:ml-4">
+                <p className="text-xs sm:text-sm text-gray-600">Total Revenue</p>
+                <p className="text-lg sm:text-2xl font-bold text-green-800">₹{stats.totalRevenue}</p>
                 <p className="text-xs text-green-600">₹{stats.todayRevenue} today</p>
               </div>
             </div>
           </div>
 
           {/* Total Orders */}
-          <div className="bg-white p-6 rounded-lg shadow border border-blue-200">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow border border-blue-200">
             <div className="flex items-center">
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <span className="text-2xl">🛒</span>
+              <div className="p-2 sm:p-3 bg-blue-100 rounded-lg">
+                <span className="text-xl sm:text-2xl">🛒</span>
               </div>
-              <div className="ml-4">
-                <p className="text-sm text-gray-600">Total Orders</p>
-                <p className="text-2xl font-bold text-blue-800">{stats.totalOrders}</p>
-                <div className="flex gap-2 text-xs">
+              <div className="ml-3 sm:ml-4">
+                <p className="text-xs sm:text-sm text-gray-600">Total Orders</p>
+                <p className="text-lg sm:text-2xl font-bold text-blue-800">{stats.totalOrders}</p>
+                <div className="flex gap-1 sm:gap-2 text-xs">
                   <span className="text-orange-600">{stats.activeOrders} active</span>
                   <span className="text-green-600">{stats.completedOrders} completed</span>
                 </div>
@@ -235,27 +243,27 @@ const AdminDashboard = () => {
           </div>
 
           {/* Customers */}
-          <div className="bg-white p-6 rounded-lg shadow border border-purple-200">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow border border-purple-200">
             <div className="flex items-center">
-              <div className="p-3 bg-purple-100 rounded-lg">
-                <span className="text-2xl">👥</span>
+              <div className="p-2 sm:p-3 bg-purple-100 rounded-lg">
+                <span className="text-xl sm:text-2xl">👥</span>
               </div>
-              <div className="ml-4">
-                <p className="text-sm text-gray-600">Customers</p>
-                <p className="text-2xl font-bold text-purple-800">{stats.totalCustomers}</p>
+              <div className="ml-3 sm:ml-4">
+                <p className="text-xs sm:text-sm text-gray-600">Customers</p>
+                <p className="text-lg sm:text-2xl font-bold text-purple-800">{stats.totalCustomers}</p>
                 <p className="text-xs text-purple-600">Unique customers</p>
               </div>
             </div>
           </div>
 
           {/* Order Status Overview */}
-          <div className="bg-white p-6 rounded-lg shadow border border-amber-200">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow border border-amber-200">
             <div className="flex items-center">
-              <div className="p-3 bg-amber-100 rounded-lg">
-                <span className="text-2xl">📊</span>
+              <div className="p-2 sm:p-3 bg-amber-100 rounded-lg">
+                <span className="text-xl sm:text-2xl">📊</span>
               </div>
-              <div className="ml-4">
-                <p className="text-sm text-gray-600">Order Status</p>
+              <div className="ml-3 sm:ml-4">
+                <p className="text-xs sm:text-sm text-gray-600">Order Status</p>
                 <div className="space-y-1 text-xs">
                   <div className="flex justify-between">
                     <span className="text-orange-600">Pending:</span>
@@ -272,34 +280,34 @@ const AdminDashboard = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-white rounded-lg shadow border border-amber-200 p-6">
-          <h2 className="text-xl font-semibold text-amber-800 mb-4">Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white rounded-lg shadow border border-amber-200 p-4 sm:p-6">
+          <h2 className="text-lg sm:text-xl font-semibold text-amber-800 mb-3 sm:mb-4">Quick Actions</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
             <button 
               onClick={() => setCurrentView('addItems')}
-              className="text-center p-4 bg-amber-50 rounded-lg hover:bg-amber-100 transition-colors cursor-pointer border border-amber-200"
+              className="text-center p-3 sm:p-4 bg-amber-50 rounded-lg hover:bg-amber-100 transition-colors cursor-pointer border border-amber-200"
             >
-              <span className="text-3xl block mb-2">➕</span>
-              <p className="font-medium">Add New Items</p>
-              <p className="text-sm text-gray-600">Create new menu items</p>
+              <span className="text-2xl sm:text-3xl block mb-1 sm:mb-2">➕</span>
+              <p className="font-medium text-sm sm:text-base">Add New Items</p>
+              <p className="text-xs sm:text-sm text-gray-600">Create new menu items</p>
             </button>
             
             <button 
               onClick={() => setCurrentView('listItems')}
-              className="text-center p-4 bg-amber-50 rounded-lg hover:bg-amber-100 transition-colors cursor-pointer border border-amber-200"
+              className="text-center p-3 sm:p-4 bg-amber-50 rounded-lg hover:bg-amber-100 transition-colors cursor-pointer border border-amber-200"
             >
-              <span className="text-3xl block mb-2">📋</span>
-              <p className="font-medium">Manage Menu</p>
-              <p className="text-sm text-gray-600">View and edit items</p>
+              <span className="text-2xl sm:text-3xl block mb-1 sm:mb-2">📋</span>
+              <p className="font-medium text-sm sm:text-base">Manage Menu</p>
+              <p className="text-xs sm:text-sm text-gray-600">View and edit items</p>
             </button>
             
             <button 
               onClick={() => setCurrentView('orders')}
-              className="text-center p-4 bg-amber-50 rounded-lg hover:bg-amber-100 transition-colors cursor-pointer border border-amber-200"
+              className="text-center p-3 sm:p-4 bg-amber-50 rounded-lg hover:bg-amber-100 transition-colors cursor-pointer border border-amber-200"
             >
-              <span className="text-3xl block mb-2">🛒</span>
-              <p className="font-medium">Order Management</p>
-              <p className="text-sm text-gray-600">Process customer orders</p>
+              <span className="text-2xl sm:text-3xl block mb-1 sm:mb-2">🛒</span>
+              <p className="font-medium text-sm sm:text-base">Order Management</p>
+              <p className="text-xs sm:text-sm text-gray-600">Process customer orders</p>
             </button>
           </div>
         </div>
@@ -336,47 +344,78 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-amber-50">
+      {/* Mobile Header */}
+      <div className="lg:hidden bg-amber-800 text-white p-4">
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="p-2 rounded-lg bg-amber-700"
+          >
+            <span className="text-xl">☰</span>
+          </button>
+          <h1 className="text-lg font-bold">Foodie-Bazar Admin</h1>
+          <div className="w-8"></div>
+        </div>
+      </div>
+
       <div className="flex">
-        <div className="w-64 bg-amber-800 min-h-screen p-6">
-       <div className="space-y-4">
+        {/* Sidebar - Hidden on mobile by default */}
+        <div className={`${isSidebarOpen ? 'block' : 'hidden'} lg:block w-64 bg-amber-800 min-h-screen p-4 lg:p-6 fixed lg:relative z-50 lg:z-auto`}>
+          <div className="space-y-2 sm:space-y-4">
+            <div className="hidden lg:block mb-6">
+              <h1 className="text-xl font-bold text-amber-100">Foodie-Bazar Admin</h1>
+            </div>
+            
             <button 
-              onClick={() => setCurrentView('dashboard')}
+              onClick={() => {
+                setCurrentView('dashboard');
+                setIsSidebarOpen(false);
+              }}
               className={`flex items-center gap-3 text-amber-100 hover:bg-amber-700 p-3 rounded-lg transition-colors w-full text-left ${
                 currentView === 'dashboard' ? 'bg-amber-700' : ''
               }`}
             >
               <span>📊</span>
-              <span>Dashboard</span>
+              <span className="text-sm lg:text-base">Dashboard</span>
             </button>
             
             <button 
-              onClick={() => setCurrentView('addItems')}
+              onClick={() => {
+                setCurrentView('addItems');
+                setIsSidebarOpen(false);
+              }}
               className={`flex items-center gap-3 text-amber-100 hover:bg-amber-700 p-3 rounded-lg transition-colors w-full text-left ${
                 currentView === 'addItems' ? 'bg-amber-700' : ''
               }`}
             >
               <span>➕</span>
-              <span>Add Items</span>
+              <span className="text-sm lg:text-base">Add Items</span>
             </button>
             
             <button 
-              onClick={() => setCurrentView('listItems')}
+              onClick={() => {
+                setCurrentView('listItems');
+                setIsSidebarOpen(false);
+              }}
               className={`flex items-center gap-3 text-amber-100 hover:bg-amber-700 p-3 rounded-lg transition-colors w-full text-left ${
                 currentView === 'listItems' ? 'bg-amber-700' : ''
               }`}
             >
               <span>📋</span>
-              <span>List Items</span>
+              <span className="text-sm lg:text-base">List Items</span>
             </button>
             
             <button 
-              onClick={() => setCurrentView('orders')}
+              onClick={() => {
+                setCurrentView('orders');
+                setIsSidebarOpen(false);
+              }}
               className={`flex items-center gap-3 text-amber-100 hover:bg-amber-700 p-3 rounded-lg transition-colors w-full text-left ${
                 currentView === 'orders' ? 'bg-amber-700' : ''
               }`}
             >
               <span>🛒</span>
-              <span>Orders</span>
+              <span className="text-sm lg:text-base">Orders</span>
               {orders.filter(order => order.status === 'pending').length > 0 && (
                 <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full ml-auto">
                   {orders.filter(order => order.status === 'pending').length}
@@ -386,19 +425,31 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        <div className="flex-1 p-8">
-          <h1 className="text-3xl font-bold text-amber-800 mb-2">
-            {currentView === 'dashboard' ? 'Dashboard' : 
-             currentView === 'addItems' ? 'Add New Item' :
-             currentView === 'listItems' ? 'Menu Items' : 'Orders Management'}
-          </h1>
-          <p className="text-amber-600 mb-8">
-            {currentView === 'dashboard' ? 'Welcome to Foodie-Bazar Admin' : 'Manage your restaurant operations'}
-          </p>
+        {/* Main Content */}
+        <div className="flex-1 p-4 sm:p-6 lg:p-8">
+          {/* Desktop Header */}
+          <div className="hidden lg:block mb-6">
+            <h1 className="text-2xl lg:text-3xl font-bold text-amber-800 mb-2">
+              {currentView === 'dashboard' ? 'Dashboard' : 
+               currentView === 'addItems' ? 'Add New Item' :
+               currentView === 'listItems' ? 'Menu Items' : 'Orders Management'}
+            </h1>
+            <p className="text-amber-600">
+              {currentView === 'dashboard' ? 'Welcome to Foodie-Bazar Admin' : 'Manage your restaurant operations'}
+            </p>
+          </div>
 
           {renderContent()}
         </div>
       </div>
+
+      {/* Mobile Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
+          onClick={() => setIsSidebarOpen(false)}
+        ></div>
+      )}
     </div>
   );
 };

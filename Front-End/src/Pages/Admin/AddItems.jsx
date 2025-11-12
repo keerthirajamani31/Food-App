@@ -57,19 +57,8 @@ const AddItems = ({ menuItems, setMenuItems, setCurrentView }) => {
 
   // Enhanced event dispatcher for real-time updates
   const dispatchUpdateEvents = () => {
-    // Dispatch multiple events to ensure all components update
     window.dispatchEvent(new Event('menuItemsUpdated'));
     window.dispatchEvent(new Event('adminDataChanged'));
-    window.dispatchEvent(new Event('storage'));
-    window.dispatchEvent(new Event('cartUpdate'));
-    
-    // Force a custom storage event for cross-tab communication
-    if (localStorage.getItem('menuItems')) {
-      const event = new Event('storage');
-      event.key = 'menuItems';
-      window.dispatchEvent(event);
-    }
-    
     console.log('🔄 Update events dispatched for real-time sync');
   };
 
@@ -182,15 +171,21 @@ const AddItems = ({ menuItems, setMenuItems, setCurrentView }) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Add New Food Item</h2>
+    <div className="max-w-4xl mx-auto p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Add New Food Item</h2>
+        <button
+          onClick={() => setCurrentView('listItems')}
+          className="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition-colors text-sm font-semibold"
+        >
+          ← Back to List
+        </button>
       </div>
       
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
+        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {/* Basic Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Item Name *</label>
               <input
@@ -198,7 +193,7 @@ const AddItems = ({ menuItems, setMenuItems, setCurrentView }) => {
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm sm:text-base"
                 placeholder="Enter item name"
                 required
                 disabled={isSubmitting}
@@ -211,7 +206,7 @@ const AddItems = ({ menuItems, setMenuItems, setCurrentView }) => {
                 name="category"
                 value={formData.category}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm sm:text-base"
                 required
                 disabled={isSubmitting}
               >
@@ -229,7 +224,7 @@ const AddItems = ({ menuItems, setMenuItems, setCurrentView }) => {
               name="description"
               value={formData.description}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm sm:text-base"
               rows="3"
               placeholder="Enter item description"
               required
@@ -237,7 +232,7 @@ const AddItems = ({ menuItems, setMenuItems, setCurrentView }) => {
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Price ($) *</label>
               <input
@@ -245,7 +240,7 @@ const AddItems = ({ menuItems, setMenuItems, setCurrentView }) => {
                 name="price"
                 value={formData.price}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm sm:text-base"
                 placeholder="0.00"
                 step="0.01"
                 min="0"
@@ -261,7 +256,7 @@ const AddItems = ({ menuItems, setMenuItems, setCurrentView }) => {
                 name="rating"
                 value={formData.rating}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm sm:text-base"
                 placeholder="4.5"
                 step="0.1"
                 min="0"
@@ -277,7 +272,7 @@ const AddItems = ({ menuItems, setMenuItems, setCurrentView }) => {
                 name="subCategory"
                 value={formData.subCategory}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm sm:text-base"
                 placeholder="e.g., Vegetarian, Spicy"
                 disabled={isSubmitting}
               />
@@ -291,7 +286,7 @@ const AddItems = ({ menuItems, setMenuItems, setCurrentView }) => {
               name="ingredients"
               value={formData.ingredients}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm sm:text-base"
               placeholder="Enter ingredients separated by commas"
               disabled={isSubmitting}
             />
@@ -305,16 +300,16 @@ const AddItems = ({ menuItems, setMenuItems, setCurrentView }) => {
               name="image"
               value={formData.image}
               onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm sm:text-base"
               placeholder="https://example.com/image.jpg"
               disabled={isSubmitting}
             />
           </div>
 
           {/* Varieties Section */}
-          <div className="border-t pt-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium text-gray-800">Varieties</h3>
+          <div className="border-t pt-4 sm:pt-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+              <h3 className="text-base sm:text-lg font-medium text-gray-800">Varieties</h3>
               <label className="flex items-center space-x-2">
                 <input
                   type="checkbox"
@@ -328,8 +323,8 @@ const AddItems = ({ menuItems, setMenuItems, setCurrentView }) => {
             </div>
 
             {hasVarieties && (
-              <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-4 bg-gray-50 p-3 sm:p-4 rounded-lg">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Variety Name *</label>
                     <input
@@ -337,7 +332,7 @@ const AddItems = ({ menuItems, setMenuItems, setCurrentView }) => {
                       name="varietyName"
                       value={formData.varietyName}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm"
                       placeholder="e.g., Small, Large, Spicy"
                       disabled={isSubmitting}
                     />
@@ -349,7 +344,7 @@ const AddItems = ({ menuItems, setMenuItems, setCurrentView }) => {
                       name="varietyPrice"
                       value={formData.varietyPrice}
                       onChange={handleInputChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm"
                       placeholder="0.00"
                       step="0.01"
                       min="0"
@@ -364,7 +359,7 @@ const AddItems = ({ menuItems, setMenuItems, setCurrentView }) => {
                     name="varietyDescription"
                     value={formData.varietyDescription}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm"
                     rows="2"
                     placeholder="Optional variety description"
                     disabled={isSubmitting}
@@ -378,7 +373,7 @@ const AddItems = ({ menuItems, setMenuItems, setCurrentView }) => {
                     name="varietyImage"
                     value={formData.varietyImage}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 text-sm"
                     placeholder="https://example.com/variety-image.jpg"
                     disabled={isSubmitting}
                   />
@@ -388,7 +383,7 @@ const AddItems = ({ menuItems, setMenuItems, setCurrentView }) => {
                   <button
                     type="button"
                     onClick={addVariety}
-                    className="bg-green-600 text-white py-2 px-6 rounded-lg hover:bg-green-700 transition-colors disabled:bg-green-400 disabled:cursor-not-allowed"
+                    className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors disabled:bg-green-400 disabled:cursor-not-allowed text-sm"
                     disabled={isSubmitting || !formData.varietyName || !formData.varietyPrice}
                   >
                     Add Variety
@@ -398,28 +393,28 @@ const AddItems = ({ menuItems, setMenuItems, setCurrentView }) => {
                 {/* Display added varieties */}
                 {varieties.length > 0 && (
                   <div className="mt-4">
-                    <h4 className="text-md font-medium text-gray-700 mb-2">Added Varieties:</h4>
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">Added Varieties:</h4>
                     <div className="space-y-2">
                       {varieties.map((variety, index) => (
-                        <div key={index} className="flex justify-between items-center bg-white p-3 rounded-lg border">
-                          <div className="flex items-center space-x-3">
+                        <div key={index} className="flex justify-between items-center bg-white p-2 sm:p-3 rounded-lg border">
+                          <div className="flex items-center space-x-2 sm:space-x-3">
                             <img 
                               src={variety.image} 
                               alt={variety.name}
-                              className="w-12 h-12 object-cover rounded"
+                              className="w-8 h-8 sm:w-12 sm:h-12 object-cover rounded"
                             />
                             <div>
-                              <span className="font-medium">{variety.name}</span>
-                              <span className="text-gray-600 ml-2">- ${variety.price}</span>
+                              <span className="font-medium text-sm">{variety.name}</span>
+                              <span className="text-gray-600 ml-2 text-sm">- ${variety.price}</span>
                               {variety.description && (
-                                <p className="text-sm text-gray-500">{variety.description}</p>
+                                <p className="text-xs text-gray-500 line-clamp-1">{variety.description}</p>
                               )}
                             </div>
                           </div>
                           <button
                             type="button"
                             onClick={() => removeVariety(index)}
-                            className="text-red-600 hover:text-red-800"
+                            className="text-red-600 hover:text-red-800 text-sm"
                             disabled={isSubmitting}
                           >
                             Remove
@@ -434,11 +429,11 @@ const AddItems = ({ menuItems, setMenuItems, setCurrentView }) => {
           </div>
 
           {/* Submit Buttons */}
-          <div className="flex gap-4 pt-4">
+          <div className="flex flex-col sm:flex-row gap-3 pt-4">
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 bg-amber-600 text-white py-3 rounded-lg hover:bg-amber-700 transition-colors font-semibold disabled:bg-amber-400 disabled:cursor-not-allowed"
+              className="flex-1 bg-amber-600 text-white py-3 rounded-lg hover:bg-amber-700 transition-colors font-semibold disabled:bg-amber-400 disabled:cursor-not-allowed text-sm sm:text-base"
             >
               {isSubmitting ? 'Adding Item...' : 'Add Food Item'}
             </button>
@@ -446,7 +441,7 @@ const AddItems = ({ menuItems, setMenuItems, setCurrentView }) => {
               type="button"
               onClick={() => setCurrentView('listItems')}
               disabled={isSubmitting}
-              className="flex-1 bg-gray-500 text-white py-3 rounded-lg hover:bg-gray-600 transition-colors font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="flex-1 bg-gray-500 text-white py-3 rounded-lg hover:bg-gray-600 transition-colors font-semibold disabled:bg-gray-400 disabled:cursor-not-allowed text-sm sm:text-base"
             >
               Cancel
             </button>

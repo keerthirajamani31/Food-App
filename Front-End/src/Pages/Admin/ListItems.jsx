@@ -13,7 +13,6 @@ const ListItems = ({ menuItems, setMenuItems, setCurrentView }) => {
   useEffect(() => {
     const loadApiItems = async () => {
       try {
-        // UPDATED: Using Render backend URL
         const response = await fetch('https://food-app-fshp.onrender.com/api/food/all');
         if (response.ok) {
           const result = await response.json();
@@ -164,7 +163,6 @@ const ListItems = ({ menuItems, setMenuItems, setCurrentView }) => {
             (v._id === varietyId || v.id === varietyId) ? { ...v, ...editFormData } : v
           );
           
-          // UPDATED: Using Render backend URL
           const response = await fetch(`https://food-app-fshp.onrender.com/api/food/${itemId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -177,7 +175,6 @@ const ListItems = ({ menuItems, setMenuItems, setCurrentView }) => {
             alert('API variety updated successfully!');
           } else throw new Error('Failed to update API variety');
         } else {
-          // UPDATED: Using Render backend URL
           const response = await fetch(`https://food-app-fshp.onrender.com/api/food/${itemId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -245,7 +242,6 @@ const ListItems = ({ menuItems, setMenuItems, setCurrentView }) => {
             v._id !== varietyId && v.id !== varietyId
           );
           
-          // UPDATED: Using Render backend URL
           const response = await fetch(`https://food-app-fshp.onrender.com/api/food/${itemId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -258,7 +254,6 @@ const ListItems = ({ menuItems, setMenuItems, setCurrentView }) => {
             alert('API variety deleted successfully!');
           } else throw new Error('Failed to delete API variety');
         } else {
-          // UPDATED: Using Render backend URL
           const response = await fetch(`https://food-app-fshp.onrender.com/api/food/${itemId}`, {
             method: 'DELETE',
           });
@@ -321,11 +316,11 @@ const ListItems = ({ menuItems, setMenuItems, setCurrentView }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
         <div className="flex justify-center items-center py-20">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-orange-500 mx-auto mb-4"></div>
-            <p className="text-slate-600 font-medium">Loading menu items...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+            <p className="text-slate-600 font-medium text-sm">Loading menu items...</p>
           </div>
         </div>
       </div>
@@ -333,13 +328,14 @@ const ListItems = ({ menuItems, setMenuItems, setCurrentView }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-6">
-      <div className="mb-8">
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
-          <div className="flex flex-wrap gap-3 justify-end">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-3 sm:p-4 lg:p-6">
+      {/* Header Section */}
+      <div className="mb-4 sm:mb-6 lg:mb-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+          <div className="flex flex-wrap gap-2 sm:gap-3 justify-end w-full sm:w-auto">
             <button
               onClick={() => setCurrentView('addItems')}
-              className="bg-orange-500 text-white px-6 py-3 rounded-xl hover:bg-orange-600 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl flex items-center gap-2"
+              className="bg-orange-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-xl hover:bg-orange-600 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl flex items-center gap-2 text-sm sm:text-base"
             >
               <span>+</span>
               Add New Item
@@ -347,46 +343,48 @@ const ListItems = ({ menuItems, setMenuItems, setCurrentView }) => {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 shadow-lg border border-slate-200 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        {/* Stats Cards */}
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-slate-200 p-4 sm:p-6 mb-4 sm:mb-6">
+          <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
             <div className="text-center">
-              <div className="text-2xl font-bold text-slate-900">{allItems.length}</div>
-              <div className="text-sm text-slate-600">Total Items</div>
+              <div className="text-lg sm:text-xl lg:text-2xl font-bold text-slate-900">{allItems.length}</div>
+              <div className="text-xs sm:text-sm text-slate-600">Total</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">
+              <div className="text-lg sm:text-xl lg:text-2xl font-bold text-purple-600">
                 {allItems.filter(item => item.type === 'main').length}
               </div>
-              <div className="text-sm text-slate-600">Main Items</div>
+              <div className="text-xs sm:text-sm text-slate-600">Main</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-amber-600">
+              <div className="text-lg sm:text-xl lg:text-2xl font-bold text-amber-600">
                 {allItems.filter(item => item.type === 'variety').length}
               </div>
-              <div className="text-sm text-slate-600">Varieties</div>
+              <div className="text-xs sm:text-sm text-slate-600">Varieties</div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Search</label>
+          {/* Filters */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+            <div className="sm:col-span-2 lg:col-span-1">
+              <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1 sm:mb-2">Search</label>
               <div className="relative">
                 <input
                   type="text"
                   placeholder="Search items..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300 bg-slate-50"
+                  className="w-full pl-8 sm:pl-10 pr-3 sm:pr-4 py-2 sm:py-3 border border-slate-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300 bg-slate-50 text-sm"
                 />
-                <span className="absolute left-3 top-3 text-slate-400">🔍</span>
+                <span className="absolute left-2 sm:left-3 top-2 sm:top-3 text-slate-400 text-sm">🔍</span>
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Category</label>
+              <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1 sm:mb-2">Category</label>
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300 bg-slate-50"
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-slate-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300 bg-slate-50 text-sm"
               >
                 {categories.map(category => (
                   <option key={category} value={category}>{category}</option>
@@ -394,30 +392,31 @@ const ListItems = ({ menuItems, setMenuItems, setCurrentView }) => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">View Mode</label>
+              <label className="block text-xs sm:text-sm font-medium text-slate-700 mb-1 sm:mb-2">View</label>
               <select
                 value={viewMode}
                 onChange={(e) => setViewMode(e.target.value)}
-                className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300 bg-slate-50"
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-slate-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300 bg-slate-50 text-sm"
               >
                 <option value="all">All Items</option>
-                <option value="main">Main Items Only</option>
+                <option value="main">Main Only</option>
                 <option value="varieties">Varieties Only</option>
               </select>
             </div>
-            <div className="flex items-end gap-2">
+            <div className="flex items-end">
               <button
                 onClick={clearFilters}
-                className="flex-1 bg-slate-500 text-white py-3 rounded-xl hover:bg-slate-600 transition-all duration-300 font-semibold"
+                className="w-full bg-slate-500 text-white py-2 sm:py-3 rounded-lg sm:rounded-xl hover:bg-slate-600 transition-all duration-300 font-semibold text-sm"
               >
                 Clear Filters
               </button>
             </div>
           </div>
           
+          {/* Filter Status */}
           {(searchTerm || selectedCategory !== 'All' || viewMode !== 'all') && (
-            <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-              <p className="text-sm text-amber-800">
+            <div className="mt-3 sm:mt-4 p-2 sm:p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs sm:text-sm">
+              <p className="text-amber-800">
                 Showing {filteredItems.length} of {allItems.length} items
                 {searchTerm && ` matching "${searchTerm}"`}
                 {selectedCategory !== 'All' && ` in ${selectedCategory}`}
@@ -428,29 +427,30 @@ const ListItems = ({ menuItems, setMenuItems, setCurrentView }) => {
         </div>
       </div>
 
+      {/* Items List */}
       {filteredItems.length === 0 ? (
-        <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-12 text-center">
-          <div className="text-6xl mb-4 text-slate-400">🍽️</div>
-          <h3 className="text-2xl font-semibold text-slate-800 mb-2">
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-slate-200 p-6 sm:p-8 lg:p-12 text-center">
+          <div className="text-4xl sm:text-6xl mb-3 sm:mb-4 text-slate-400">🍽️</div>
+          <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold text-slate-800 mb-2">
             {allItems.length === 0 ? 'No Items Found' : 'No Matching Items'}
           </h3>
-          <p className="text-slate-500 mb-8 max-w-md mx-auto">
+          <p className="text-slate-500 mb-6 sm:mb-8 max-w-md mx-auto text-sm sm:text-base">
             {allItems.length === 0 
               ? 'Get started by adding items to your menu. They will appear here for management.'
               : 'No items found matching your search criteria. Try adjusting your search terms or filters.'
             }
           </p>
-          <div className="flex gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
             <button
               onClick={() => setCurrentView('addItems')}
-              className="bg-orange-500 text-white px-8 py-4 rounded-xl hover:bg-orange-600 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl"
+              className="bg-orange-500 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg sm:rounded-xl hover:bg-orange-600 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl text-sm sm:text-base"
             >
               Add New Menu Items
             </button>
             {(searchTerm || selectedCategory !== 'All' || viewMode !== 'all') && (
               <button
                 onClick={clearFilters}
-                className="bg-slate-500 text-white px-8 py-4 rounded-xl hover:bg-slate-600 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl"
+                className="bg-slate-500 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg sm:rounded-xl hover:bg-slate-600 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl text-sm sm:text-base"
               >
                 Clear Filters
               </button>
@@ -458,31 +458,31 @@ const ListItems = ({ menuItems, setMenuItems, setCurrentView }) => {
           </div>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {filteredItems.map(item => (
             <div
               key={item.fullId}
-              className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-slate-200"
+              className="bg-white rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-slate-200"
             >
               {editingItem === item.fullId ? (
-                <div className="p-6">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="p-4 sm:p-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                     <div className="flex flex-col items-center">
-                      <div className="relative w-full h-64 rounded-xl overflow-hidden mb-4">
+                      <div className="relative w-full h-40 sm:h-48 lg:h-64 rounded-lg sm:rounded-xl overflow-hidden mb-3 sm:mb-4">
                         <img
                           src={editFormData.image || item.displayImage || 'https://via.placeholder.com/150'}
                           alt={editFormData.name || item.displayName}
                           className="w-full h-full object-cover"
                         />
                       </div>
-                      <div className="text-sm text-slate-600 text-center">
+                      <div className="text-xs sm:text-sm text-slate-600 text-center">
                         {item.type === 'variety' && `Variety of: ${item.parentItem}`}
                         {item.type === 'main' && 'Main Item'}
                       </div>
                     </div>
 
-                    <div className="space-y-4">
-                      <h3 className="text-xl font-bold text-slate-900 mb-4">
+                    <div className="space-y-3 sm:space-y-4">
+                      <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-3 sm:mb-4">
                         Edit {item.type === 'variety' ? 'Variety' : 'Item'}
                       </h3>
                       
@@ -491,7 +491,7 @@ const ListItems = ({ menuItems, setMenuItems, setCurrentView }) => {
                         name="name"
                         value={editFormData.name || ''}
                         onChange={handleEditInputChange}
-                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300"
+                        className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-slate-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300 text-sm"
                         placeholder="Name"
                       />
                       
@@ -499,8 +499,8 @@ const ListItems = ({ menuItems, setMenuItems, setCurrentView }) => {
                         name="description"
                         value={editFormData.description || ''}
                         onChange={handleEditInputChange}
-                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300"
-                        rows="3"
+                        className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-slate-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300 text-sm"
+                        rows="2"
                         placeholder="Description"
                       />
                       
@@ -509,7 +509,7 @@ const ListItems = ({ menuItems, setMenuItems, setCurrentView }) => {
                         name="price"
                         value={editFormData.price || ''}
                         onChange={handleEditInputChange}
-                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300"
+                        className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-slate-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300 text-sm"
                         step="0.01"
                         placeholder="Price"
                       />
@@ -519,20 +519,20 @@ const ListItems = ({ menuItems, setMenuItems, setCurrentView }) => {
                         name="image"
                         value={editFormData.image || ''}
                         onChange={handleEditInputChange}
-                        className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300"
+                        className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-slate-300 rounded-lg sm:rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-300 text-sm"
                         placeholder="Image URL"
                       />
 
-                      <div className="flex gap-3">
+                      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                         <button
                           onClick={() => handleSaveEdit(item.fullId)}
-                          className="flex-1 bg-green-500 text-white py-3 rounded-xl hover:bg-green-600 transition-all duration-300 font-semibold"
+                          className="flex-1 bg-green-500 text-white py-2 sm:py-3 rounded-lg sm:rounded-xl hover:bg-green-600 transition-all duration-300 font-semibold text-sm"
                         >
                           Save Changes
                         </button>
                         <button
                           onClick={handleCancelEdit}
-                          className="flex-1 bg-slate-500 text-white py-3 rounded-xl hover:bg-slate-600 transition-all duration-300 font-semibold"
+                          className="flex-1 bg-slate-500 text-white py-2 sm:py-3 rounded-lg sm:rounded-xl hover:bg-slate-600 transition-all duration-300 font-semibold text-sm"
                         >
                           Cancel
                         </button>
@@ -541,10 +541,11 @@ const ListItems = ({ menuItems, setMenuItems, setCurrentView }) => {
                   </div>
                 </div>
               ) : (
-                <div className="p-6">
-                  <div className="flex flex-col lg:flex-row gap-6">
+                <div className="p-4 sm:p-6">
+                  <div className="flex flex-col lg:flex-row gap-4 sm:gap-6">
+                    {/* Image */}
                     <div className="lg:w-1/4">
-                      <div className="relative h-48 lg:h-40 rounded-xl overflow-hidden">
+                      <div className="relative h-32 sm:h-36 lg:h-40 rounded-lg sm:rounded-xl overflow-hidden">
                         <img
                           src={item.displayImage || 'https://via.placeholder.com/150'}
                           alt={item.displayName}
@@ -553,32 +554,33 @@ const ListItems = ({ menuItems, setMenuItems, setCurrentView }) => {
                       </div>
                     </div>
 
+                    {/* Content */}
                     <div className="lg:w-2/4 flex flex-col justify-between">
                       <div>
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                        <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-2">
+                          <span className="bg-orange-500 text-white px-2 sm:px-3 py-1 rounded-full text-xs font-semibold">
                             {item.displayCategory}
                           </span>
                           {item.type === 'variety' && (
-                            <span className="bg-slate-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                              Variety of: {item.parentItem}
+                            <span className="bg-slate-500 text-white px-2 sm:px-3 py-1 rounded-full text-xs font-semibold">
+                              Variety: {item.parentItem}
                             </span>
                           )}
                         </div>
                         
-                        <h3 className="text-xl font-bold text-slate-900 mb-2">
+                        <h3 className="text-base sm:text-lg lg:text-xl font-bold text-slate-900 mb-2 line-clamp-1">
                           {item.displayName}
                         </h3>
                         
-                        <p className="text-slate-600 text-sm mb-4 line-clamp-2">
+                        <p className="text-slate-600 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-2">
                           {item.displayDescription}
                         </p>
                         
                         {item.ingredients && item.ingredients.length > 0 && (
-                          <div className="mb-3">
-                            <div className="text-xs font-semibold text-slate-700 mb-2">Ingredients:</div>
+                          <div className="mb-2 sm:mb-3">
+                            <div className="text-xs font-semibold text-slate-700 mb-1 sm:mb-2">Ingredients:</div>
                             <div className="flex flex-wrap gap-1">
-                              {item.ingredients.slice(0, 3).map((ingredient, index) => (
+                              {item.ingredients.slice(0, 2).map((ingredient, index) => (
                                 <span 
                                   key={index} 
                                   className="bg-slate-100 text-slate-700 px-2 py-1 rounded-full text-xs font-medium"
@@ -586,9 +588,9 @@ const ListItems = ({ menuItems, setMenuItems, setCurrentView }) => {
                                   {ingredient}
                                 </span>
                               ))}
-                              {item.ingredients.length > 3 && (
+                              {item.ingredients.length > 2 && (
                                 <span className="bg-slate-100 text-slate-600 px-2 py-1 rounded-full text-xs font-medium">
-                                  +{item.ingredients.length - 3} more
+                                  +{item.ingredients.length - 2} more
                                 </span>
                               )}
                             </div>
@@ -596,27 +598,28 @@ const ListItems = ({ menuItems, setMenuItems, setCurrentView }) => {
                         )}
                       </div>
                       
-                      <div className="flex items-center gap-4 text-sm">
+                      <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm">
                         <div className="flex items-center gap-1 text-amber-500">
                           <span>⭐</span>
                           <span className="font-semibold">{item.rating || '4.0'}</span>
                         </div>
-                        <div className="text-lg font-bold text-green-600">
+                        <div className="text-base sm:text-lg font-bold text-green-600">
                           ${item.displayPrice}
                         </div>
                       </div>
                     </div>
 
-                    <div className="lg:w-1/4 flex flex-col justify-center gap-3">
+                    {/* Actions */}
+                    <div className="lg:w-1/4 flex flex-row lg:flex-col justify-center gap-2 sm:gap-3">
                       <button
                         onClick={() => handleEdit(item)}
-                        className="w-full bg-amber-500 text-black py-3 rounded-xl hover:bg-amber-600 transition-all duration-300 font-semibold flex items-center justify-center gap-2"
+                        className="flex-1 lg:w-full bg-amber-500 text-black py-2 sm:py-3 rounded-lg sm:rounded-xl hover:bg-amber-600 transition-all duration-300 font-semibold flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm"
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => handleDelete(item.fullId)}
-                        className="w-full bg-red-500 text-white py-3 rounded-xl hover:bg-red-600 transition-all duration-300 font-semibold flex items-center justify-center gap-2"
+                        className="flex-1 lg:w-full bg-red-500 text-white py-2 sm:py-3 rounded-lg sm:rounded-xl hover:bg-red-600 transition-all duration-300 font-semibold flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm"
                       >
                         Delete
                       </button>
