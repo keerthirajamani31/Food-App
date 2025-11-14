@@ -1,7 +1,9 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react';
+import { FaShoppingCart, FaUser, FaArrowLeft, FaClock, FaCheck, FaTimes, FaInfoCircle } from 'react-icons/fa';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Userorder = () => {
-   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [userOrders, setUserOrders] = useState([]);
   const navigate = useNavigate();
@@ -30,10 +32,10 @@ const Userorder = () => {
     checkAuth();
   }, [navigate]);
 
-  // SIMPLE FIX: Load ALL orders without filtering for testing
-  const loadAllOrders = () => {
+  // Load orders for current user
+  const loadUserOrders = () => {
     try {
-      console.log('🔄 Loading ALL orders...');
+      console.log('🔄 Loading user orders...');
       
       const ordersData = localStorage.getItem('orders');
       console.log('📦 Raw orders data:', ordersData);
@@ -47,11 +49,27 @@ const Userorder = () => {
       const allOrders = JSON.parse(ordersData);
       console.log('📋 ALL orders from storage:', allOrders);
       
-      // TEMPORARY: Show ALL orders without filtering
-      const allOrdersSorted = allOrders.sort((a, b) => new Date(b.date) - new Date(a.date));
+      // Get current user
+      const currentUser = JSON.parse(localStorage.getItem('user') || 'null');
+      console.log('👤 Current user:', currentUser);
       
-      console.log('✅ Showing ALL orders (no filtering):', allOrdersSorted.length);
-      setUserOrders(allOrdersSorted);
+      if (!currentUser) {
+        console.log('❌ No user found');
+        setUserOrders([]);
+        return;
+      }
+
+      // Filter orders for current user
+      const userOrders = allOrders.filter(order => 
+        order.customerEmail === currentUser.emailAddress || 
+        order.customerEmail === currentUser.email ||
+        order.customerName === currentUser.username
+      );
+      
+      const userOrdersSorted = userOrders.sort((a, b) => new Date(b.date) - new Date(a.date));
+      
+      console.log('✅ User orders found:', userOrdersSorted.length);
+      setUserOrders(userOrdersSorted);
       
     } catch (error) {
       console.error('Error loading orders:', error);
@@ -62,7 +80,7 @@ const Userorder = () => {
   // Load orders on component mount
   useEffect(() => {
     if (isLoggedIn) {
-      loadAllOrders();
+      loadUserOrders();
     }
   }, [isLoggedIn]);
 
@@ -70,7 +88,7 @@ const Userorder = () => {
   useEffect(() => {
     const handleOrderUpdate = () => {
       console.log('📢 Order update received');
-      setTimeout(loadAllOrders, 500);
+      setTimeout(loadUserOrders, 500);
     };
 
     window.addEventListener('newOrder', handleOrderUpdate);
@@ -96,7 +114,7 @@ const Userorder = () => {
 User: ${currentUser?.username}
 User Email: ${currentUser?.emailAddress || currentUser?.email}
 Total Orders: ${allOrders.length}
-Displayed: ${userOrders.length}
+Your Orders: ${userOrders.length}
 
 Check console for details
     `);
@@ -178,11 +196,6 @@ Check console for details
               View Cart
             </Link>
           </div>
-        </div>
-
-        {/* TEMPORARY WARNING */}
-        <div className="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded mb-6">
-          <strong>Note:</strong> Currently showing ALL orders from storage for debugging
         </div>
 
         {userOrders.length === 0 ? (
@@ -284,5 +297,4 @@ Check console for details
   );
 };
 
-
-export default Userorder
+export default Userorder;
