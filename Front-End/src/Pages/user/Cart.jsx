@@ -23,12 +23,14 @@ const Cart = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Authentication check
+  // Authentication check - IMPROVED
   useEffect(() => {
     const checkAuth = () => {
       try {
         const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
         const userData = JSON.parse(localStorage.getItem('user') || 'null');
+        
+        console.log('🔐 Cart Auth Check:', { loggedIn, userData });
         
         setIsLoggedIn(loggedIn);
         setUser(userData);
@@ -161,7 +163,7 @@ const Cart = () => {
     alert('Logged out successfully!');
   };
 
-  // FIXED: Show order confirmation in cart instead of immediate navigation
+  // FIXED: Improved order creation with better user data handling
   const handleCheckout = () => {
     if (cartItems.length === 0) {
       alert('Your cart is empty!');
@@ -179,32 +181,50 @@ const Cart = () => {
       return;
     }
 
+    // Get fresh user data to ensure consistency
+    const currentUser = JSON.parse(localStorage.getItem('user') || 'null');
+    console.log('👤 Current user data for order:', currentUser);
+
+    if (!currentUser) {
+      alert('User data not found. Please login again.');
+      navigate('/login');
+      return;
+    }
+
+    // Create order with comprehensive user data
     const order = {
       id: `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      customerName: user?.username || 'Customer',
-      customerEmail: user?.emailAddress || user?.email || 'No email provided',
+      customerName: currentUser?.username || currentUser?.name || 'Customer',
+      customerEmail: currentUser?.emailAddress || currentUser?.email || currentUser?.username || 'no-email@example.com',
+      customerId: currentUser?.id || currentUser?._id || currentUser?.username,
       items: [...cartItems],
       totalAmount: total.toFixed(2),
       status: 'pending',
       date: new Date().toISOString(),
-      address: user?.address || 'No address provided',
-      phone: user?.phoneNumber || user?.phone || 'No phone provided',
-      paymentMethod: 'cash-on-delivery'
+      address: currentUser?.address || 'No address provided',
+      phone: currentUser?.phoneNumber || currentUser?.phone || 'No phone provided',
+      paymentMethod: 'cash-on-delivery',
+      timestamp: Date.now()
     };
 
+    console.log('💾 Creating order:', order);
+
     try {
-      console.log('💾 Saving order:', order);
-      
-      // Get existing orders or initialize empty array
+      // Get existing orders
       const existingOrders = JSON.parse(localStorage.getItem('orders') || '[]');
-      console.log('📦 Existing orders:', existingOrders);
+      console.log('📦 Existing orders count:', existingOrders.length);
       
       // Add new order
       existingOrders.push(order);
       
       // Save back to localStorage
       localStorage.setItem('orders', JSON.stringify(existingOrders));
-      console.log('✅ Order saved successfully');
+      console.log('✅ Order saved successfully. Total orders now:', existingOrders.length);
+      
+      // Verify the order was saved
+      const verifyOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+      console.log('🔍 Verification - orders in storage:', verifyOrders.length);
+      console.log('🔍 Last order saved:', verifyOrders[verifyOrders.length - 1]);
       
       // Set recent order and show confirmation
       setRecentOrder(order);
@@ -213,10 +233,12 @@ const Cart = () => {
       // Clear cart
       clearCart();
       
-      // Dispatch events for other components
-      window.dispatchEvent(new Event('newOrder'));
+      // Dispatch multiple events for reliability
+      window.dispatchEvent(new CustomEvent('newOrder', { detail: order }));
       window.dispatchEvent(new Event('orderUpdate'));
       window.dispatchEvent(new Event('storage'));
+      
+      console.log('🎉 Order process completed successfully');
       
     } catch (error) {
       console.error('❌ Error placing order:', error);
@@ -226,7 +248,11 @@ const Cart = () => {
 
   const handleViewOrders = () => {
     setShowOrderConfirmation(false);
-    navigate('/orders');
+    
+    // Add a small delay to ensure orders are processed
+    setTimeout(() => {
+      navigate('/orders');
+    }, 500);
   };
 
   const handleContinueShopping = () => {
@@ -310,6 +336,7 @@ const Cart = () => {
     </div>
   );
 
+  // ... (rest of the component remains the same for mobile cart drawer, floating button, etc.)
   // Mobile Cart Drawer
   const MobileCartDrawer = () => (
     <div className={`fixed inset-0 z-50 transform transition-transform duration-300 ease-in-out ${
