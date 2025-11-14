@@ -32,7 +32,7 @@ const App = () => {
                 <Route index element={<AdminDashboard />} />
                 <Route path="add-items" element={<AddItems />} />
                 <Route path="list" element={<ListItems />} />
-                <Route path="order" element={<Orders />} />
+                <Route path="adminorder" element={<Orders />} />
                 <Route path='offer' element={<AdminOffers/>}/>
                 <Route path='admin' element={<AdminPanel/>}/>
               </Routes>
@@ -54,7 +54,7 @@ const App = () => {
                 <Route path="login" element={<Login />} />
                 <Route path="logout" element={<Logout />} />
             <Route path='register' element={<Register/>}/>
-                <Route path="/orders" element={<orderBooking/>}/>
+                <Route path="orders" element={<orderBooking/>}/>
               </Routes>
               <Footer />
             </>
