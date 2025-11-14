@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaShoppingCart, FaUser, FaArrowLeft, FaClock, FaCheck, FaTimes, FaInfoCircle } from 'react-icons/fa';
+import { FaShoppingCart, FaUser, FaArrowLeft, FaClock, FaCheck, FaTimes, FaInfoCircle, FaBox } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 
 const Userorder = () => {
@@ -35,26 +35,17 @@ const Userorder = () => {
   // Load orders for current user
   const loadUserOrders = () => {
     try {
-      console.log('🔄 Loading user orders...');
-      
       const ordersData = localStorage.getItem('orders');
-      console.log('📦 Raw orders data:', ordersData);
       
       if (!ordersData || ordersData === 'undefined' || ordersData === 'null') {
-        console.log('❌ No orders found');
         setUserOrders([]);
         return;
       }
 
       const allOrders = JSON.parse(ordersData);
-      console.log('📋 ALL orders from storage:', allOrders);
-      
-      // Get current user
       const currentUser = JSON.parse(localStorage.getItem('user') || 'null');
-      console.log('👤 Current user:', currentUser);
       
       if (!currentUser) {
-        console.log('❌ No user found');
         setUserOrders([]);
         return;
       }
@@ -67,8 +58,6 @@ const Userorder = () => {
       );
       
       const userOrdersSorted = userOrders.sort((a, b) => new Date(b.date) - new Date(a.date));
-      
-      console.log('✅ User orders found:', userOrdersSorted.length);
       setUserOrders(userOrdersSorted);
       
     } catch (error) {
@@ -87,7 +76,6 @@ const Userorder = () => {
   // Listen for order updates
   useEffect(() => {
     const handleOrderUpdate = () => {
-      console.log('📢 Order update received');
       setTimeout(loadUserOrders, 500);
     };
 
@@ -99,26 +87,6 @@ const Userorder = () => {
       window.removeEventListener('orderUpdate', handleOrderUpdate);
     };
   }, []);
-
-  // Debug function
-  const debugStorage = () => {
-    const allOrders = JSON.parse(localStorage.getItem('orders') || '[]');
-    const currentUser = JSON.parse(localStorage.getItem('user') || 'null');
-    
-    console.log('🐛 DEBUG STORAGE:');
-    console.log('Current User:', currentUser);
-    console.log('All Orders:', allOrders);
-    console.log('Displayed Orders:', userOrders);
-    
-    alert(`Debug Info:
-User: ${currentUser?.username}
-User Email: ${currentUser?.emailAddress || currentUser?.email}
-Total Orders: ${allOrders.length}
-Your Orders: ${userOrders.length}
-
-Check console for details
-    `);
-  };
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -163,100 +131,101 @@ Check console for details
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
+    <div className="min-h-screen bg-gray-50 py-4 px-3 sm:px-4">
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-8">
+        {/* Header - Mobile Optimized */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <Link 
             to="/menu" 
-            className="flex items-center gap-2 text-orange-600 hover:text-orange-700 transition-colors font-semibold"
+            className="flex items-center gap-2 text-orange-600 hover:text-orange-700 transition-colors font-semibold text-sm sm:text-base"
           >
             <FaArrowLeft />
             <span>Back to Menu</span>
           </Link>
           
-          <div className="text-center">
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">Your Orders</h1>
-            <div className="flex items-center justify-center gap-2 text-gray-600">
+          <div className="text-center order-first sm:order-none">
+            <h1 className="text-2xl sm:text-4xl font-bold text-gray-800 mb-1 sm:mb-2">Your Orders</h1>
+            <div className="flex items-center justify-center gap-2 text-gray-600 text-sm sm:text-base">
               <FaUser className="text-orange-500" />
               <span>Welcome, {user?.username}!</span>
             </div>
           </div>
           
-          <div className="flex items-center gap-4">
-            <button 
-              onClick={debugStorage}
-              className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors font-semibold"
-            >
-              Debug 🐛
-            </button>
+          <div className="flex items-center justify-center gap-3 sm:gap-4 order-last sm:order-none">
             <Link 
               to="/cart"
-              className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors font-semibold"
+              className="bg-orange-500 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg hover:bg-orange-600 transition-colors font-semibold text-sm flex items-center gap-2"
             >
-              View Cart
+              <FaShoppingCart size={14} />
+              <span className="hidden sm:inline">Cart</span>
             </Link>
           </div>
         </div>
 
+        {/* Orders List */}
         {userOrders.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-lg p-12 text-center">
-            <FaShoppingCart className="text-orange-400 text-6xl mx-auto mb-4" />
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">No orders found</h3>
-            <p className="text-gray-600 mb-6">Orders will appear here once you place them</p>
-            <button 
-              onClick={debugStorage}
-              className="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition-colors font-semibold mr-4"
-            >
-              Check Storage
-            </button>
-            <Link 
-              to="/menu"
-              className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors font-semibold"
-            >
-              Start Shopping
-            </Link>
+          <div className="bg-white rounded-lg shadow-lg p-6 sm:p-12 text-center">
+            <FaBox className="text-orange-400 text-4xl sm:text-6xl mx-auto mb-4" />
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mb-2">No orders found</h3>
+            <p className="text-gray-600 mb-6 text-sm sm:text-base">Orders will appear here once you place them</p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Link 
+                to="/menu"
+                className="bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition-colors font-semibold text-sm sm:text-base"
+              >
+                Start Shopping
+              </Link>
+            </div>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {userOrders.map(order => (
-              <div key={order.id} className="bg-white rounded-lg shadow-lg p-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="font-bold text-lg text-gray-800">
+              <div key={order.id} className="bg-white rounded-lg shadow-lg p-4 sm:p-6">
+                {/* Order Header - Mobile Optimized */}
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-4">
+                  <div className="flex-1">
+                    <h3 className="font-bold text-gray-800 text-lg sm:text-xl mb-1">
                       Order #{order.id.slice(-8).toUpperCase()}
                     </h3>
-                    <p className="text-gray-600 text-sm">
+                    <p className="text-gray-600 text-xs sm:text-sm">
                       {new Date(order.date).toLocaleDateString()} at {new Date(order.date).toLocaleTimeString()}
                     </p>
-                    <p className="text-gray-500 text-xs">
-                      Customer: {order.customerName} ({order.customerEmail})
+                    <p className="text-gray-500 text-xs mt-1">
+                      Customer: {order.customerName}
                     </p>
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(order.status)}`}>
+                  <span className={`px-3 py-1 rounded-full text-xs sm:text-sm font-semibold ${getStatusColor(order.status)} self-start sm:self-auto`}>
                     <div className="flex items-center gap-1">
                       {getStatusIcon(order.status)}
-                      {order.status.charAt(0).toUpperCase() + order.status.slice(1).replace('-', ' ')}
+                      <span className="hidden sm:inline">
+                        {order.status.charAt(0).toUpperCase() + order.status.slice(1).replace('-', ' ')}
+                      </span>
+                      <span className="sm:hidden">
+                        {order.status.charAt(0).toUpperCase()}
+                      </span>
                     </div>
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  <div className="lg:col-span-2">
-                    <h4 className="font-semibold text-gray-800 mb-3">Order Items</h4>
-                    <div className="space-y-3">
+                {/* Order Content - Mobile Optimized */}
+                <div className="flex flex-col gap-4 sm:gap-6">
+                  {/* Order Items - Mobile Scrollable */}
+                  <div className="sm:col-span-2">
+                    <h4 className="font-semibold text-gray-800 mb-3 text-sm sm:text-base">Order Items</h4>
+                    <div className="space-y-2 max-h-40 sm:max-h-none overflow-y-auto">
                       {order.items.map((item, index) => (
-                        <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                        <div key={index} className="flex items-center gap-3 p-2 sm:p-3 bg-gray-50 rounded-lg">
                           <img 
                             src={item.image} 
                             alt={item.name}
-                            className="w-16 h-16 object-cover rounded-lg"
+                            className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-lg flex-shrink-0"
                           />
-                          <div className="flex-1">
-                            <h5 className="font-semibold text-gray-800">{item.name}</h5>
-                            <p className="text-sm text-gray-600">Qty: {item.quantity} × ₹{item.price}</p>
+                          <div className="flex-1 min-w-0">
+                            <h5 className="font-semibold text-gray-800 text-sm sm:text-base truncate">{item.name}</h5>
+                            <p className="text-gray-600 text-xs sm:text-sm">Qty: {item.quantity} × ₹{item.price}</p>
                           </div>
-                          <div className="text-right">
-                            <p className="font-semibold text-gray-800">
+                          <div className="text-right flex-shrink-0">
+                            <p className="font-semibold text-gray-800 text-sm sm:text-base">
                               ₹{(item.price * item.quantity).toFixed(2)}
                             </p>
                           </div>
@@ -265,9 +234,10 @@ Check console for details
                     </div>
                   </div>
 
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <h4 className="font-semibold text-gray-800 mb-3">Order Summary</h4>
-                    <div className="space-y-2 text-sm">
+                  {/* Order Summary - Mobile Compact */}
+                  <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
+                    <h4 className="font-semibold text-gray-800 mb-3 text-sm sm:text-base">Order Summary</h4>
+                    <div className="space-y-1 sm:space-y-2 text-xs sm:text-sm">
                       <div className="flex justify-between">
                         <span>Subtotal:</span>
                         <span>₹{order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2)}</span>
@@ -280,18 +250,29 @@ Check console for details
                         <span>Delivery Fee:</span>
                         <span>₹40.00</span>
                       </div>
-                      <hr />
-                      <div className="flex justify-between font-semibold">
+                      <hr className="my-2" />
+                      <div className="flex justify-between font-semibold text-sm sm:text-base">
                         <span>Total:</span>
                         <span className="text-orange-600">₹{order.totalAmount}</span>
                       </div>
                     </div>
                   </div>
                 </div>
+
+                {/* Delivery Info - Mobile Only */}
+                <div className="mt-4 pt-4 border-t border-gray-200 sm:hidden">
+                  <div className="text-xs text-gray-600">
+                    <p><strong>Delivery to:</strong> {order.address || 'No address provided'}</p>
+                    <p className="mt-1"><strong>Payment:</strong> {order.paymentMethod?.replace('-', ' ') || 'Cash on delivery'}</p>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
         )}
+
+        {/* Bottom Spacing for Mobile */}
+        <div className="h-8 sm:h-4"></div>
       </div>
     </div>
   );
