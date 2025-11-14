@@ -46,7 +46,7 @@ const OrderBooking = () => {
     checkAuth();
   }, [navigate]);
 
-  // FIXED: Improved order loading with better debugging
+  // FIXED: Improved order loading with multiple email field checks
   const loadUserOrders = () => {
     try {
       console.log('🔄 Loading orders...');
@@ -64,32 +64,41 @@ const OrderBooking = () => {
       const allOrders = JSON.parse(ordersData);
       console.log('📋 Parsed all orders:', allOrders);
       
-      const userEmail = user?.emailAddress || user?.email;
-      console.log('👤 Looking for orders for user:', userEmail);
+      // Get user email from multiple possible fields
+      const userEmail = user?.emailAddress || user?.email || user?.username;
+      console.log('👤 Current user email/username:', userEmail);
       
       if (!userEmail) {
-        console.log('❌ No user email found');
+        console.log('❌ No user identifier found');
         setUserOrders([]);
         return;
       }
 
-      // Filter orders for current user - case insensitive comparison
+      // FIXED: More flexible filtering - check multiple fields and be case insensitive
       const userOrders = allOrders
         .filter(order => {
-          const orderEmail = order.customerEmail?.toLowerCase().trim();
-          const userEmailLower = userEmail.toLowerCase().trim();
-          const match = orderEmail === userEmailLower;
-          console.log('🔍 Order email match:', { 
-            orderEmail, 
-            userEmailLower, 
-            match,
-            orderId: order.id 
+          // Check multiple possible email fields in order
+          const orderEmail = order.customerEmail?.toLowerCase().trim() || 
+                           order.email?.toLowerCase().trim() ||
+                           order.customerName?.toLowerCase().trim();
+          
+          const userIdentifier = userEmail.toLowerCase().trim();
+          
+          const match = orderEmail === userIdentifier;
+          
+          console.log('🔍 Order match check:', { 
+            orderId: order.id,
+            orderEmail,
+            userIdentifier, 
+            match
           });
+          
           return match;
         })
         .sort((a, b) => new Date(b.date) - new Date(a.date));
       
-      console.log('✅ Final user orders:', userOrders);
+      console.log('✅ Final user orders found:', userOrders.length);
+      console.log('📝 User orders:', userOrders);
       setUserOrders(userOrders);
       
     } catch (error) {
@@ -106,15 +115,16 @@ const OrderBooking = () => {
     }
   }, [isLoggedIn, user]);
 
-  // Listen for order updates
+  // Listen for order updates with better timing
   useEffect(() => {
     const handleOrderUpdate = () => {
-      console.log('📢 Order update event received');
+      console.log('📢 Order update event received in OrderBooking');
       setTimeout(() => {
         if (isLoggedIn && user) {
+          console.log('🔄 Reloading orders after update');
           loadUserOrders();
         }
-      }, 500);
+      }, 1000); // Increased delay to ensure data is saved
     };
 
     window.addEventListener('newOrder', handleOrderUpdate);
@@ -127,6 +137,13 @@ const OrderBooking = () => {
       window.removeEventListener('storage', handleOrderUpdate);
     };
   }, [isLoggedIn, user]);
+
+  // Also load orders when component mounts
+  useEffect(() => {
+    if (isLoggedIn && user) {
+      loadUserOrders();
+    }
+  }, []);
 
   const cancelOrder = (orderId) => {
     if (!window.confirm('Are you sure you want to cancel this order?')) {
@@ -144,12 +161,7 @@ const OrderBooking = () => {
       localStorage.setItem('orders', JSON.stringify(updatedOrders));
       
       // Update local state
-      const userEmail = user?.emailAddress || user?.email;
-      const filteredOrders = updatedOrders.filter(order => 
-        order.customerEmail?.toLowerCase() === userEmail?.toLowerCase()
-      ).sort((a, b) => new Date(b.date) - new Date(a.date));
-      
-      setUserOrders(filteredOrders);
+      loadUserOrders();
       
       // Trigger events
       window.dispatchEvent(new Event('orderUpdate'));
@@ -203,16 +215,54 @@ const OrderBooking = () => {
   const debugOrders = () => {
     console.log('🐛 DEBUG ORDERS:');
     console.log('User:', user);
-    console.log('All orders in localStorage:', JSON.parse(localStorage.getItem('orders') || '[]'));
+    const allOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+    console.log('All orders in localStorage:', allOrders);
     console.log('Current userOrders state:', userOrders);
     
-    // Show alert with debug info
-    const allOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+    // Show detailed debug info
     alert(`Debug Info:
-Total Orders: ${allOrders.length}
+User: ${user?.username}
 User Email: ${user?.emailAddress || user?.email}
-User Orders Found: ${userOrders.length}
+Total Orders in Storage: ${allOrders.length}
+Your Orders Found: ${userOrders.length}
+
+Check browser console for detailed logs
     `);
+  };
+
+  // Test function to create a sample order
+  const createTestOrder = () => {
+    const testOrder = {
+      id: `test_order_${Date.now()}`,
+      customerName: user?.username || 'Test User',
+      customerEmail: user?.emailAddress || user?.email || 'test@example.com',
+      items: [
+        {
+          id: 'test_item_1',
+          name: 'Test Item',
+          price: 100,
+          quantity: 2,
+          image: 'https://via.placeholder.com/150'
+        }
+      ],
+      totalAmount: '240.00',
+      status: 'pending',
+      date: new Date().toISOString(),
+      address: 'Test Address',
+      phone: '1234567890',
+      paymentMethod: 'cash-on-delivery'
+    };
+
+    try {
+      const existingOrders = JSON.parse(localStorage.getItem('orders') || '[]');
+      existingOrders.push(testOrder);
+      localStorage.setItem('orders', JSON.stringify(existingOrders));
+      
+      window.dispatchEvent(new Event('newOrder'));
+      alert('Test order created! Check if it appears in your orders.');
+    } catch (error) {
+      console.error('Error creating test order:', error);
+    }
   };
 
   // If not logged in, show login prompt
@@ -261,22 +311,32 @@ User Orders Found: ${userOrders.length}
               <FaUser className="text-orange-500" />
               <span>Welcome, {user?.username}!</span>
             </div>
+            <p className="text-sm text-gray-500 mt-1">
+              {user?.emailAddress || user?.email}
+            </p>
           </div>
           
-          <div className="flex items-center gap-4 self-end sm:self-auto">
+          <div className="flex items-center gap-2 self-end sm:self-auto">
             <Link 
               to="/cart"
               className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors font-semibold text-sm sm:text-base"
             >
               View Cart
             </Link>
-            {/* Debug button - remove in production */}
+            {/* Debug buttons */}
             <button 
               onClick={debugOrders}
               className="bg-gray-500 text-white px-3 py-2 rounded-lg hover:bg-gray-600 transition-colors font-semibold text-sm"
               title="Debug Orders"
             >
               🐛
+            </button>
+            <button 
+              onClick={createTestOrder}
+              className="bg-blue-500 text-white px-3 py-2 rounded-lg hover:bg-blue-600 transition-colors font-semibold text-sm"
+              title="Create Test Order"
+            >
+              Test
             </button>
           </div>
         </div>
@@ -300,6 +360,12 @@ User Orders Found: ${userOrders.length}
                 >
                   <FaExclamationTriangle />
                   Debug Orders
+                </button>
+                <button 
+                  onClick={createTestOrder}
+                  className="flex items-center justify-center gap-2 bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors font-semibold"
+                >
+                  Create Test Order
                 </button>
               </div>
             </div>
