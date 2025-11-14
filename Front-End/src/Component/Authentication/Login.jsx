@@ -13,6 +13,12 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // Function to check if response is JSON
+  const isJsonResponse = (response) => {
+    const contentType = response.headers.get('content-type');
+    return contentType && contentType.includes('application/json');
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -48,6 +54,19 @@ const Login = () => {
       });
 
       console.log('📡 Login Response Status:', loginResponse.status);
+
+      // Check if response is JSON before parsing
+      if (!isJsonResponse(loginResponse)) {
+        const textResponse = await loginResponse.text();
+        console.error('❌ Non-JSON Response:', textResponse.substring(0, 200));
+        
+        // Check if it's an HTML error page
+        if (textResponse.includes('<!DOCTYPE') || textResponse.includes('<html')) {
+          throw new Error('Server error: Please try again later');
+        } else {
+          throw new Error('Unexpected response from server');
+        }
+      }
 
       if (loginResponse.ok) {
         const data = await loginResponse.json();
@@ -99,6 +118,13 @@ const Login = () => {
           'Content-Type': 'application/json',
         },
       });
+
+      // Check if users response is JSON
+      if (!isJsonResponse(usersResponse)) {
+        const textResponse = await usersResponse.text();
+        console.error('❌ Non-JSON Users Response:', textResponse.substring(0, 200));
+        throw new Error('Server error: Unable to fetch users');
+      }
 
       if (!usersResponse.ok) {
         throw new Error('Failed to fetch users');
@@ -160,15 +186,82 @@ const Login = () => {
     } catch (error) {
       console.error('❌ Login error:', error);
       
-      // For mobile-specific network issues, try fallback
-      if (error.message.includes('Failed to fetch') || error.message.includes('Network')) {
-        setError('Network error. Please check your internet connection and try again.');
+      // Try local storage fallback for mobile when API is completely down
+      if (error.message.includes('Failed to fetch') || 
+          error.message.includes('Network') || 
+          error.message.includes('Server error')) {
+        
+        try {
+          console.log('🔄 Trying local storage fallback login...');
+          await tryLocalStorageLogin();
+        } catch (fallbackError) {
+          console.error('❌ Local storage login failed:', fallbackError);
+          setError('Network error. Please check your internet connection and try again.');
+        }
       } else {
-        setError('Login failed. Please check your credentials and try again.');
+        setError(error.message || 'Login failed. Please check your credentials and try again.');
       }
     } finally {
       setLoading(false);
     }
+  };
+
+  // Local storage fallback login for mobile when API is down
+  const tryLocalStorageLogin = async () => {
+    return new Promise((resolve, reject) => {
+      try {
+        const existingUsers = JSON.parse(localStorage.getItem('foodAppUsers') || '[]');
+        console.log('🔍 Checking local storage users:', existingUsers.length);
+        
+        const user = existingUsers.find(u => 
+          u.username === formData.username && 
+          u.password === formData.password
+        );
+        
+        if (user) {
+          const userInfo = {
+            id: user.id,
+            fullName: user.fullName,
+            username: user.username,
+            emailAddress: user.emailAddress,
+            phoneNumber: user.phoneNumber,
+            isLoggedIn: true,
+            loginTime: new Date().toISOString()
+          };
+          
+          // Save to localStorage
+          localStorage.setItem('user', JSON.stringify(userInfo));
+          localStorage.setItem('isLoggedIn', 'true');
+          
+          // Force storage event for mobile browsers
+          window.dispatchEvent(new Event('storage'));
+          
+          // Dispatch custom event
+          const loginEvent = new CustomEvent('userLoggedIn', { 
+            detail: userInfo 
+          });
+          window.dispatchEvent(loginEvent);
+          
+          console.log('🔑 User logged in via local storage:', userInfo);
+          
+          alert(`Welcome back, ${userInfo.fullName || userInfo.username}! (Offline Mode)`);
+          
+          setTimeout(() => {
+            navigate('/menu');
+          }, 100);
+          resolve(true);
+        } else {
+          const userExists = existingUsers.find(u => u.username === formData.username);
+          if (userExists) {
+            reject(new Error('Invalid password! Please check your password.'));
+          } else {
+            reject(new Error('User not found! Please register first.'));
+          }
+        }
+      } catch (error) {
+        reject(error);
+      }
+    });
   };
 
   const handleCreateAccount = () => {
@@ -254,6 +347,13 @@ const Login = () => {
           >
             Create New Account
           </button>
+        </div>
+
+        {/* Mobile-specific help text */}
+        <div className="mt-4 p-3 bg-blue-500/20 border border-blue-500 rounded-lg">
+          <p className="text-blue-300 text-xs text-center">
+            📱 <strong>Mobile Users:</strong> If login fails, try switching between WiFi and mobile data.
+          </p>
         </div>
       </form> 
     </div>
