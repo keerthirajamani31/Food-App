@@ -21,56 +21,71 @@ const Cart = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Check authentication
+  // Check authentication - SIMPLIFIED VERSION
   useEffect(() => {
     const checkAuth = () => {
       try {
         const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
         const userData = JSON.parse(localStorage.getItem('user') || 'null');
+        console.log('🔄 Auth Check - LoggedIn:', loggedIn, 'User:', userData);
         setIsLoggedIn(loggedIn);
         setUser(userData);
+        
+        // On mobile, always load cart regardless of login status
+        if (isMobile) {
+          loadCart();
+        } else if (loggedIn) {
+          loadCart();
+        }
       } catch (error) {
+        console.error('❌ Auth check error:', error);
         setIsLoggedIn(false);
+        // On mobile, still load cart even if auth fails
+        if (isMobile) {
+          loadCart();
+        }
       }
     };
 
     checkAuth();
 
-    const handleStorageChange = () => checkAuth();
-    const handleLoginEvent = () => checkAuth();
+    // Listen for login events
+    const handleLoginEvent = () => {
+      console.log('🔑 Login event detected');
+      setTimeout(checkAuth, 100); // Small delay to ensure localStorage is updated
+    };
 
-    window.addEventListener('storage', handleStorageChange);
+    const handleStorageChange = () => {
+      console.log('💾 Storage change detected');
+      checkAuth();
+    };
+
     window.addEventListener('userLoggedIn', handleLoginEvent);
+    window.addEventListener('storage', handleStorageChange);
     
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('userLoggedIn', handleLoginEvent);
+      window.removeEventListener('storage', handleStorageChange);
     };
-  }, [navigate]);
+  }, [navigate, isMobile]);
 
-  // Load cart function
+  // Load cart function - SIMPLIFIED
   const loadCart = () => {
     try {
       const savedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+      console.log('🛒 Loading cart items:', savedCart);
       setCartItems(savedCart);
     } catch (error) {
+      console.error('❌ Cart load error:', error);
       setCartItems([]);
     }
   };
 
+  // Listen for cart updates
   useEffect(() => {
-    // On mobile: always load cart (no login check)
-    // On laptop: only load cart if logged in
-    if (isMobile) {
-      loadCart(); // Mobile: always load
-    } else if (isLoggedIn) {
-      loadCart(); // Laptop: only load if logged in
-    }
-
     const handleCartUpdate = () => {
-      if (isMobile || isLoggedIn) {
-        loadCart();
-      }
+      console.log('🔄 Cart update event received');
+      loadCart();
     };
 
     window.addEventListener('cartUpdate', handleCartUpdate);
@@ -78,7 +93,7 @@ const Cart = () => {
     return () => {
       window.removeEventListener('cartUpdate', handleCartUpdate);
     };
-  }, [isLoggedIn, isMobile]);
+  }, []);
 
   const updateCart = (updatedCart) => {
     setCartItems(updatedCart);
@@ -119,16 +134,27 @@ const Cart = () => {
   };
 
   const handleLogin = () => {
+    console.log('🔑 Navigating to login');
     navigate('/login');
   };
 
   const handleLogout = () => {
+    console.log('🚪 Logging out user');
     localStorage.removeItem('user');
     localStorage.removeItem('isLoggedIn');
     setIsLoggedIn(false);
     setUser(null);
-    window.dispatchEvent(new Event('userLoggedOut'));
+    
+    // Create and dispatch logout event
+    const logoutEvent = new CustomEvent('userLoggedOut');
+    window.dispatchEvent(logoutEvent);
+    
     alert('Logged out successfully!');
+    
+    // Reload cart for mobile (guest mode)
+    if (isMobile) {
+      loadCart();
+    }
   };
 
   const handleCheckout = () => {
@@ -187,6 +213,9 @@ const Cart = () => {
   const deliveryFee = subtotal > 0 ? 40 : 0;
   const total = subtotal + tax + deliveryFee;
 
+  // Debug info (remove in production)
+  console.log('📱 Mobile:', isMobile, '🔑 LoggedIn:', isLoggedIn, '👤 User:', user, '🛒 Cart Items:', cartItems.length);
+
   // On laptop: show login prompt if not logged in
   if (!isMobile && !isLoggedIn) {
     return (
@@ -214,6 +243,7 @@ const Cart = () => {
     );
   }
 
+  // Mobile & Desktop cart display
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-6xl mx-auto">
@@ -233,6 +263,11 @@ const Cart = () => {
               <div className="flex items-center justify-center gap-2 text-gray-600">
                 <FaUser className="text-orange-500" />
                 <span>Welcome, {user?.username || 'User'}!</span>
+              </div>
+            ) : isMobile ? (
+              <div className="flex items-center justify-center gap-2 text-blue-600">
+                <FaShoppingCart className="text-blue-500" />
+                <span>Guest Shopping Cart</span>
               </div>
             ) : (
               <div className="flex items-center justify-center gap-2 text-amber-600">
@@ -272,14 +307,27 @@ const Cart = () => {
         {cartItems.length === 0 ? (
           <div className="bg-white rounded-lg shadow-lg p-12 text-center">
             <FaShoppingCart className="text-orange-400 text-6xl mx-auto mb-4" />
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">Your cart is empty</h3>
-            <p className="text-gray-600 mb-6">Add some delicious items from our menu</p>
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">
+              {isMobile ? 'Your cart is empty' : 'Your cart is empty'}
+            </h3>
+            <p className="text-gray-600 mb-6">
+              {isMobile ? 'Add some delicious items from our menu' : 'Add some delicious items from our menu'}
+            </p>
             <Link 
               to="/menu"
               className="bg-orange-500 text-white px-8 py-3 rounded-lg hover:bg-orange-600 transition-colors font-semibold inline-block"
             >
               Browse Menu
             </Link>
+            
+            {/* Mobile-specific message */}
+            {isMobile && !isLoggedIn && (
+              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                <p className="text-blue-700 text-sm">
+                  💡 <strong>Tip:</strong> You can add items to cart without login, but you'll need to login to checkout.
+                </p>
+              </div>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -349,6 +397,11 @@ const Cart = () => {
                     <FaUser className="text-orange-500" />
                     <span className="font-semibold text-gray-800">{user?.username || 'User'}</span>
                   </div>
+                ) : isMobile ? (
+                  <div className="flex items-center gap-2 mb-4 p-3 bg-blue-50 rounded-lg">
+                    <FaShoppingCart className="text-blue-500" />
+                    <span className="font-semibold text-blue-700">Guest Shopping</span>
+                  </div>
                 ) : (
                   <div className="flex items-center gap-2 mb-4 p-3 bg-amber-50 rounded-lg">
                     <FaSignInAlt className="text-amber-500" />
@@ -383,10 +436,12 @@ const Cart = () => {
                   className={`w-full text-white py-3 rounded-lg font-semibold transition-colors mb-3 shadow-md ${
                     isLoggedIn 
                       ? 'bg-green-600 hover:bg-green-700' 
+                      : isMobile
+                      ? 'bg-blue-600 hover:bg-blue-700'
                       : 'bg-amber-500 hover:bg-amber-600'
                   }`}
                 >
-                  {isLoggedIn ? 'Place Order' : 'Login to Checkout'}
+                  {isLoggedIn ? 'Place Order' : (isMobile ? 'Login to Checkout' : 'Login to Checkout')}
                 </button>
                 
                 <Link 
@@ -400,6 +455,15 @@ const Cart = () => {
                   <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-center">
                     <p className="text-amber-700 text-sm">
                       Add ₹{(299 - subtotal).toFixed(2)} more for free delivery!
+                    </p>
+                  </div>
+                )}
+
+                {/* Mobile-specific login reminder */}
+                {isMobile && !isLoggedIn && cartItems.length > 0 && (
+                  <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-blue-700 text-sm text-center">
+                      🔐 <strong>Login required</strong> to complete your order
                     </p>
                   </div>
                 )}

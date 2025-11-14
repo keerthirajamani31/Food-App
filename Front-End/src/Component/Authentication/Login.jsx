@@ -31,11 +31,11 @@ const Login = () => {
     }
 
     try {
-      console.log('🔄 Attempting login with:', formData.username);
+      console.log('📱 Mobile Login Attempt:', formData.username);
       
       const API_BASE_URL = 'https://food-app-fshp.onrender.com';
       
-      // Try direct login endpoint first
+      // Try login endpoint
       const loginResponse = await fetch(`${API_BASE_URL}/api/users/login`, {
         method: 'POST',
         headers: {
@@ -47,13 +47,14 @@ const Login = () => {
         }),
       });
 
-      console.log('📡 Login response status:', loginResponse.status);
+      console.log('📡 Login Response Status:', loginResponse.status);
 
       if (loginResponse.ok) {
         const data = await loginResponse.json();
-        console.log('✅ Login successful:', data);
+        console.log('✅ Login Successful:', data);
         
         if (data.success) {
+          // Create user info object
           const userInfo = {
             id: data.user._id || data.user.id,
             fullName: data.user.fullName || data.user.username,
@@ -64,22 +65,33 @@ const Login = () => {
             loginTime: new Date().toISOString()
           };
           
+          // Save to localStorage
           localStorage.setItem('user', JSON.stringify(userInfo));
           localStorage.setItem('isLoggedIn', 'true');
           
+          // Force storage event for mobile browsers
+          window.dispatchEvent(new Event('storage'));
+          
+          // Dispatch custom event
           const loginEvent = new CustomEvent('userLoggedIn', { 
             detail: userInfo 
           });
           window.dispatchEvent(loginEvent);
           
+          console.log('🔑 User saved to localStorage:', userInfo);
+          
           alert(`Welcome back, ${userInfo.fullName || userInfo.username}!`);
-          navigate('/menu');
+          
+          // Force reload cart data
+          setTimeout(() => {
+            navigate('/menu');
+          }, 100);
           return;
         }
       }
 
-      // If login endpoint fails, try getting all users and checking manually
-      console.log('🔄 Login endpoint failed, trying manual check...');
+      // If login endpoint fails, try manual user check
+      console.log('🔄 Trying manual user check...');
       
       const usersResponse = await fetch(`${API_BASE_URL}/api/users/all`, {
         method: 'GET',
@@ -93,7 +105,7 @@ const Login = () => {
       }
 
       const usersData = await usersResponse.json();
-      console.log('📦 Users data:', usersData);
+      console.log('📦 Users data received:', usersData.users?.length || 0, 'users');
 
       if (usersData.success && usersData.users) {
         const user = usersData.users.find(u => 
@@ -112,16 +124,27 @@ const Login = () => {
             loginTime: new Date().toISOString()
           };
           
+          // Save to localStorage
           localStorage.setItem('user', JSON.stringify(userInfo));
           localStorage.setItem('isLoggedIn', 'true');
           
+          // Force storage event for mobile browsers
+          window.dispatchEvent(new Event('storage'));
+          
+          // Dispatch custom event
           const loginEvent = new CustomEvent('userLoggedIn', { 
             detail: userInfo 
           });
           window.dispatchEvent(loginEvent);
           
+          console.log('🔑 User saved via manual check:', userInfo);
+          
           alert(`Welcome back, ${userInfo.fullName || userInfo.username}!`);
-          navigate('/menu');
+          
+          // Force reload cart data
+          setTimeout(() => {
+            navigate('/menu');
+          }, 100);
         } else {
           const userExists = usersData.users.find(u => u.username === formData.username);
           if (userExists) {
@@ -136,7 +159,13 @@ const Login = () => {
 
     } catch (error) {
       console.error('❌ Login error:', error);
-      setError('Login failed. Please check your credentials and try again.');
+      
+      // For mobile-specific network issues, try fallback
+      if (error.message.includes('Failed to fetch') || error.message.includes('Network')) {
+        setError('Network error. Please check your internet connection and try again.');
+      } else {
+        setError('Login failed. Please check your credentials and try again.');
+      }
     } finally {
       setLoading(false);
     }
