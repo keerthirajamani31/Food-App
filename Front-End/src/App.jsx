@@ -15,9 +15,9 @@ import AdminNavbar from './Component/Admin/AdminNavbar';
 import Menu from './Pages/user/Menu/Menu';
 import Footer from './Component/user/Footer'; 
 import Register from './Component/Authentication/Register'
-import orderBooking from './Pages/user/Menu/orderBooking';
 import AdminOffers from './Component/Admin/AdminOffers';
 import AdminPanel from './Component/Admin/AdminPanel';
+import Orderbooking from './Pages/user/orderBooking';
 
 const App = () => {
   return (
@@ -54,7 +54,7 @@ const App = () => {
                 <Route path="login" element={<Login />} />
                 <Route path="logout" element={<Logout />} />
                 <Route path='register' element={<Register/>}/>
-                <Route path="orders" element={<orderBooking/>}/> 
+                <Route path='order' element={<Orderbooking/>}/>
               </Routes>
               <Footer />
             </>
