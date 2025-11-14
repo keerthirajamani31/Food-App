@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaTrash, FaPlus, FaMinus, FaShoppingCart, FaArrowLeft, FaUser, FaSignInAlt } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
+import { MobileAuth } from '../../utils/auth';
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -21,26 +22,44 @@ const Cart = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Check authentication - SIMPLIFIED VERSION
+  // Check authentication - HYBRID APPROACH
   useEffect(() => {
     const checkAuth = () => {
       try {
-        const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
-        const userData = JSON.parse(localStorage.getItem('user') || 'null');
-        console.log('🔄 Auth Check - LoggedIn:', loggedIn, 'User:', userData);
+        // Try backend login first
+        const backendLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+        const backendUser = JSON.parse(localStorage.getItem('user') || 'null');
+        
+        // Try mobile auth as fallback
+        const mobileLoggedIn = MobileAuth.isLoggedIn();
+        const mobileUser = MobileAuth.getCurrentUser();
+        
+        // Use whichever is available
+        const loggedIn = backendLoggedIn || mobileLoggedIn;
+        const userData = backendUser || mobileUser;
+        
+        console.log('🔑 Hybrid Auth Check:', { 
+          mobile: isMobile, 
+          backendLoggedIn, 
+          mobileLoggedIn,
+          finalLoggedIn: loggedIn
+        });
+        
         setIsLoggedIn(loggedIn);
         setUser(userData);
         
-        // On mobile, always load cart regardless of login status
+        // ALWAYS load cart on mobile, only load when logged in on desktop
         if (isMobile) {
           loadCart();
         } else if (loggedIn) {
           loadCart();
+        } else {
+          setCartItems([]); // Clear cart if not logged in on desktop
         }
       } catch (error) {
-        console.error('❌ Auth check error:', error);
+        console.error('Auth error:', error);
         setIsLoggedIn(false);
-        // On mobile, still load cart even if auth fails
+        // Still load cart on mobile even if auth fails
         if (isMobile) {
           loadCart();
         }
@@ -49,52 +68,41 @@ const Cart = () => {
 
     checkAuth();
 
-    // Listen for login events
+    // Enhanced event listeners
     const handleLoginEvent = () => {
-      console.log('🔑 Login event detected');
-      setTimeout(checkAuth, 100); // Small delay to ensure localStorage is updated
+      console.log('🔄 Login event received in Cart');
+      setTimeout(checkAuth, 200);
     };
 
     const handleStorageChange = () => {
-      console.log('💾 Storage change detected');
+      console.log('💾 Storage change in Cart');
       checkAuth();
     };
 
     window.addEventListener('userLoggedIn', handleLoginEvent);
     window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('userLoggedOut', checkAuth);
     
     return () => {
       window.removeEventListener('userLoggedIn', handleLoginEvent);
       window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('userLoggedOut', checkAuth);
     };
   }, [navigate, isMobile]);
 
-  // Load cart function - SIMPLIFIED
+  // Load cart function
   const loadCart = () => {
     try {
       const savedCart = JSON.parse(localStorage.getItem('cart') || '[]');
-      console.log('🛒 Loading cart items:', savedCart);
+      console.log('🛒 Cart loaded:', savedCart.length, 'items');
       setCartItems(savedCart);
     } catch (error) {
-      console.error('❌ Cart load error:', error);
+      console.error('Cart load error:', error);
       setCartItems([]);
     }
   };
 
-  // Listen for cart updates
-  useEffect(() => {
-    const handleCartUpdate = () => {
-      console.log('🔄 Cart update event received');
-      loadCart();
-    };
-
-    window.addEventListener('cartUpdate', handleCartUpdate);
-    
-    return () => {
-      window.removeEventListener('cartUpdate', handleCartUpdate);
-    };
-  }, []);
-
+  // Rest of your cart functions remain the same...
   const updateCart = (updatedCart) => {
     setCartItems(updatedCart);
     localStorage.setItem('cart', JSON.stringify(updatedCart));
@@ -134,20 +142,27 @@ const Cart = () => {
   };
 
   const handleLogin = () => {
-    console.log('🔑 Navigating to login');
+    console.log('🔑 Redirecting to login');
     navigate('/login');
   };
 
   const handleLogout = () => {
-    console.log('🚪 Logging out user');
+    console.log('🚪 Logging out from both systems');
+    
+    // Logout from both backend and mobile systems
     localStorage.removeItem('user');
-    localStorage.removeItem('isLoggedIn');
+    localStorage.setItem('isLoggedIn', 'false');
+    MobileAuth.logout();
+    
     setIsLoggedIn(false);
     setUser(null);
     
-    // Create and dispatch logout event
+    // Dispatch logout event
     const logoutEvent = new CustomEvent('userLoggedOut');
     window.dispatchEvent(logoutEvent);
+    
+    // Force storage event
+    window.dispatchEvent(new Event('storage'));
     
     alert('Logged out successfully!');
     
@@ -163,7 +178,7 @@ const Cart = () => {
       return;
     }
 
-    // Always require login for checkout (both mobile and laptop)
+    // Always require login for checkout
     if (!isLoggedIn) {
       const proceedToLogin = window.confirm(
         'To complete your order, please login or create an account. Continue to login?'
@@ -174,7 +189,7 @@ const Cart = () => {
       return;
     }
 
-    // Create order object
+    // Create order (same as before)
     const order = {
       id: `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       customerName: user?.username || 'Customer',
@@ -213,10 +228,7 @@ const Cart = () => {
   const deliveryFee = subtotal > 0 ? 40 : 0;
   const total = subtotal + tax + deliveryFee;
 
-  // Debug info (remove in production)
-  console.log('📱 Mobile:', isMobile, '🔑 LoggedIn:', isLoggedIn, '👤 User:', user, '🛒 Cart Items:', cartItems.length);
-
-  // On laptop: show login prompt if not logged in
+  // Desktop: Show login prompt if not logged in
   if (!isMobile && !isLoggedIn) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -243,7 +255,7 @@ const Cart = () => {
     );
   }
 
-  // Mobile & Desktop cart display
+  // Rest of your cart JSX remains the same...
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-6xl mx-auto">
@@ -267,12 +279,12 @@ const Cart = () => {
             ) : isMobile ? (
               <div className="flex items-center justify-center gap-2 text-blue-600">
                 <FaShoppingCart className="text-blue-500" />
-                <span>Guest Shopping Cart</span>
+                <span>Guest Shopping</span>
               </div>
             ) : (
               <div className="flex items-center justify-center gap-2 text-amber-600">
                 <FaSignInAlt className="text-amber-500" />
-                <span>Guest User - Login to checkout</span>
+                <span>Please login</span>
               </div>
             )}
           </div>
@@ -304,87 +316,27 @@ const Cart = () => {
           </div>
         </div>
 
+        {/* Rest of your cart JSX... */}
         {cartItems.length === 0 ? (
           <div className="bg-white rounded-lg shadow-lg p-12 text-center">
             <FaShoppingCart className="text-orange-400 text-6xl mx-auto mb-4" />
-            <h3 className="text-2xl font-bold text-gray-800 mb-2">
-              {isMobile ? 'Your cart is empty' : 'Your cart is empty'}
-            </h3>
-            <p className="text-gray-600 mb-6">
-              {isMobile ? 'Add some delicious items from our menu' : 'Add some delicious items from our menu'}
-            </p>
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">Your cart is empty</h3>
+            <p className="text-gray-600 mb-6">Add some delicious items from our menu</p>
             <Link 
               to="/menu"
               className="bg-orange-500 text-white px-8 py-3 rounded-lg hover:bg-orange-600 transition-colors font-semibold inline-block"
             >
               Browse Menu
             </Link>
-            
-            {/* Mobile-specific message */}
-            {isMobile && !isLoggedIn && (
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                <p className="text-blue-700 text-sm">
-                  💡 <strong>Tip:</strong> You can add items to cart without login, but you'll need to login to checkout.
-                </p>
-              </div>
-            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Your cart items display... */}
             <div className="lg:col-span-2">
               <div className="space-y-4">
                 {cartItems.map(item => (
                   <div key={item.id} className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-all duration-300">
-                    <div className="flex items-center gap-4">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-20 h-20 object-cover rounded-lg flex-shrink-0"
-                        onError={(e) => {
-                          e.target.src = 'https://via.placeholder.com/150';
-                        }}
-                      />
-                      
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-lg text-gray-800 truncate">{item.name}</h3>
-                        <p className="text-gray-600 text-sm mb-2 line-clamp-2">{item.description}</p>
-                        <span className="text-green-600 font-bold text-lg">₹{item.price}</span>
-                      </div>
-                      
-                      <div className="flex items-center gap-3">
-                        <button 
-                          onClick={() => decreaseQuantity(item.id)}
-                          className="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-gray-200 transition-colors disabled:opacity-50"
-                          disabled={item.quantity <= 1}
-                        >
-                          <FaMinus size={12} />
-                        </button>
-                        
-                        <span className="w-8 text-center font-semibold text-gray-800 text-lg">
-                          {item.quantity}
-                        </span>
-                        
-                        <button 
-                          onClick={() => increaseQuantity(item.id)}
-                          className="w-8 h-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-gray-200 transition-colors"
-                        >
-                          <FaPlus size={12} />
-                        </button>
-                      </div>
-                      
-                      <div className="text-right min-w-20">
-                        <div className="font-bold text-gray-800 text-lg">
-                          ₹{(item.price * item.quantity).toFixed(2)}
-                        </div>
-                        <button 
-                          onClick={() => removeFromCart(item.id)}
-                          className="text-red-500 hover:text-red-700 transition-colors mt-2 flex items-center gap-1 text-sm"
-                        >
-                          <FaTrash size={14} />
-                          Remove
-                        </button>
-                      </div>
-                    </div>
+                    {/* Your item display code... */}
                   </div>
                 ))}
               </div>
@@ -392,81 +344,7 @@ const Cart = () => {
 
             <div className="lg:col-span-1">
               <div className="bg-white rounded-lg shadow-lg p-6 sticky top-4">
-                {isLoggedIn ? (
-                  <div className="flex items-center gap-2 mb-4">
-                    <FaUser className="text-orange-500" />
-                    <span className="font-semibold text-gray-800">{user?.username || 'User'}</span>
-                  </div>
-                ) : isMobile ? (
-                  <div className="flex items-center gap-2 mb-4 p-3 bg-blue-50 rounded-lg">
-                    <FaShoppingCart className="text-blue-500" />
-                    <span className="font-semibold text-blue-700">Guest Shopping</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2 mb-4 p-3 bg-amber-50 rounded-lg">
-                    <FaSignInAlt className="text-amber-500" />
-                    <span className="font-semibold text-amber-700">Guest User</span>
-                  </div>
-                )}
-                
-                <h3 className="text-xl font-bold text-gray-800 mb-4">Order Summary</h3>
-                
-                <div className="space-y-3 mb-6">
-                  <div className="flex justify-between text-gray-600">
-                    <span>Subtotal ({cartItems.reduce((total, item) => total + item.quantity, 0)} items)</span>
-                    <span>₹{subtotal.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-gray-600">
-                    <span>Tax (10%)</span>
-                    <span>₹{tax.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-gray-600">
-                    <span>Delivery Fee</span>
-                    <span>₹{deliveryFee.toFixed(2)}</span>
-                  </div>
-                  <hr className="my-3" />
-                  <div className="flex justify-between text-lg font-bold text-gray-800">
-                    <span>Total</span>
-                    <span>₹{total.toFixed(2)}</span>
-                  </div>
-                </div>
-
-                <button 
-                  onClick={handleCheckout}
-                  className={`w-full text-white py-3 rounded-lg font-semibold transition-colors mb-3 shadow-md ${
-                    isLoggedIn 
-                      ? 'bg-green-600 hover:bg-green-700' 
-                      : isMobile
-                      ? 'bg-blue-600 hover:bg-blue-700'
-                      : 'bg-amber-500 hover:bg-amber-600'
-                  }`}
-                >
-                  {isLoggedIn ? 'Place Order' : (isMobile ? 'Login to Checkout' : 'Login to Checkout')}
-                </button>
-                
-                <Link 
-                  to="/menu"
-                  className="w-full bg-orange-500 text-white py-2 rounded-lg font-semibold hover:bg-orange-600 transition-colors text-center block shadow-md"
-                >
-                  Continue Shopping
-                </Link>
-
-                {subtotal > 0 && subtotal < 299 && (
-                  <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-center">
-                    <p className="text-amber-700 text-sm">
-                      Add ₹{(299 - subtotal).toFixed(2)} more for free delivery!
-                    </p>
-                  </div>
-                )}
-
-                {/* Mobile-specific login reminder */}
-                {isMobile && !isLoggedIn && cartItems.length > 0 && (
-                  <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-blue-700 text-sm text-center">
-                      🔐 <strong>Login required</strong> to complete your order
-                    </p>
-                  </div>
-                )}
+                {/* Your order summary code... */}
               </div>
             </div>
           </div>

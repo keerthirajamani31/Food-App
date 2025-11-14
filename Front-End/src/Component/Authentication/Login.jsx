@@ -3,6 +3,7 @@ import { LuUserRoundPen } from "react-icons/lu";
 import { FaLock } from "react-icons/fa";
 import { FaUserPlus } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
+import { MobileAuth } from '../../utils/auth'; // Adjust path based on your structure
 
 const Login = () => {
   const navigate = useNavigate();
@@ -12,44 +13,20 @@ const Login = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
-  // Function to check if response is JSON
-  const isJsonResponse = (response) => {
-    const contentType = response.headers.get('content-type');
-    return contentType && contentType.includes('application/json');
-  };
+  const [usingOfflineMode, setUsingOfflineMode] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     if (error) setError('');
-  };
-
-  // Function to sync local storage with backend users
-  const syncUsersWithBackend = async () => {
-    try {
-      const API_BASE_URL = 'https://food-app-fshp.onrender.com';
-      const response = await fetch(`${API_BASE_URL}/api/users/all`);
-      
-      if (response.ok && isJsonResponse(response)) {
-        const data = await response.json();
-        if (data.success && data.users) {
-          // Store backend users in localStorage for mobile fallback
-          localStorage.setItem('backendUsers', JSON.stringify(data.users));
-          console.log('🔄 Synced backend users to localStorage:', data.users.length);
-          return data.users;
-        }
-      }
-    } catch (error) {
-      console.log('⚠️ Could not sync with backend, using local data');
-    }
-    return null;
+    setUsingOfflineMode(false);
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setUsingOfflineMode(false);
 
     if (!formData.username || !formData.password) {
       setError('Please enter both username and password');
@@ -57,15 +34,12 @@ const Login = () => {
       return;
     }
 
+    // First try backend API (for laptop users)
     try {
-      console.log('📱 Mobile Login Attempt:', formData.username);
+      console.log('🖥️ Trying backend login...');
       
       const API_BASE_URL = 'https://food-app-fshp.onrender.com';
       
-      // First, try to sync with backend to get latest users
-      const backendUsers = await syncUsersWithBackend();
-      
-      // Try login endpoint
       const loginResponse = await fetch(`${API_BASE_URL}/api/users/login`, {
         method: 'POST',
         headers: {
@@ -77,214 +51,65 @@ const Login = () => {
         }),
       });
 
-      console.log('📡 Login Response Status:', loginResponse.status);
-
-      // Check if response is JSON before parsing
-      if (!isJsonResponse(loginResponse)) {
-        const textResponse = await loginResponse.text();
-        console.error('❌ Non-JSON Response:', textResponse.substring(0, 200));
-        
-        // If not JSON, try manual user check
-        await tryManualUserCheck(backendUsers);
-        return;
-      }
-
       if (loginResponse.ok) {
         const data = await loginResponse.json();
-        console.log('✅ Login Successful via API:', data);
+        console.log('✅ Backend login successful:', data);
         
         if (data.success) {
-          await handleSuccessfulLogin(data.user);
-          return;
-        }
-      }
-
-      // If login endpoint fails, try manual user check
-      console.log('🔄 Login endpoint failed, trying manual user check...');
-      await tryManualUserCheck(backendUsers);
-
-    } catch (error) {
-      console.error('❌ Login error:', error);
-      
-      // Try local storage fallback for mobile when API is completely down
-      if (error.message.includes('Failed to fetch') || 
-          error.message.includes('Network') || 
-          error.message.includes('Server error')) {
-        
-        try {
-          console.log('🔄 Trying local storage fallback login...');
-          await tryLocalStorageLogin();
-        } catch (fallbackError) {
-          console.error('❌ All login methods failed:', fallbackError);
-          setError('Network error. Please check your internet connection and try again.');
-        }
-      } else {
-        setError(error.message || 'Login failed. Please check your credentials and try again.');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const tryManualUserCheck = async (backendUsers) => {
-    try {
-      const API_BASE_URL = 'https://food-app-fshp.onrender.com';
-      
-      let users = backendUsers;
-      
-      // If no backend users provided, fetch them
-      if (!users) {
-        const usersResponse = await fetch(`${API_BASE_URL}/api/users/all`);
-        
-        if (!isJsonResponse(usersResponse)) {
-          throw new Error('Server returned invalid response');
-        }
-
-        if (!usersResponse.ok) {
-          throw new Error('Failed to fetch users');
-        }
-
-        const usersData = await usersResponse.json();
-        console.log('📦 Users data received:', usersData.users?.length || 0, 'users');
-
-        if (usersData.success && usersData.users) {
-          users = usersData.users;
-          // Store for future use
-          localStorage.setItem('backendUsers', JSON.stringify(users));
-        } else {
-          throw new Error('Invalid response from server');
-        }
-      }
-
-      // Check credentials against users
-      const user = users.find(u => 
-        u.username === formData.username && 
-        u.password === formData.password
-      );
-      
-      if (user) {
-        console.log('✅ Manual user check successful');
-        await handleSuccessfulLogin(user);
-      } else {
-        const userExists = users.find(u => u.username === formData.username);
-        if (userExists) {
-          setError('Invalid password! Please check your password.');
-        } else {
-          setError('User not found! Please register first.');
-        }
-      }
-    } catch (error) {
-      console.error('❌ Manual user check failed:', error);
-      throw error;
-    }
-  };
-
-  const handleSuccessfulLogin = async (userData) => {
-    const userInfo = {
-      id: userData._id || userData.id,
-      fullName: userData.fullName || userData.username,
-      username: userData.username,
-      emailAddress: userData.emailAddress || userData.email,
-      phoneNumber: userData.phoneNumber || userData.phone,
-      isLoggedIn: true,
-      loginTime: new Date().toISOString()
-    };
-    
-    // Save to localStorage
-    localStorage.setItem('user', JSON.stringify(userInfo));
-    localStorage.setItem('isLoggedIn', 'true');
-    
-    // Also save to mobile users list for consistency
-    const mobileUsers = JSON.parse(localStorage.getItem('mobileUsers') || '[]');
-    const userExists = mobileUsers.find(u => u.username === userInfo.username);
-    if (!userExists) {
-      mobileUsers.push({
-        ...userInfo,
-        password: formData.password // Store for local login (not secure for production)
-      });
-      localStorage.setItem('mobileUsers', JSON.stringify(mobileUsers));
-    }
-    
-    // Force storage event for mobile browsers
-    window.dispatchEvent(new Event('storage'));
-    
-    // Dispatch custom event
-    const loginEvent = new CustomEvent('userLoggedIn', { 
-      detail: userInfo 
-    });
-    window.dispatchEvent(loginEvent);
-    
-    console.log('🔑 User logged in successfully:', userInfo);
-    
-    alert(`Welcome back, ${userInfo.fullName || userInfo.username}!`);
-    
-    // Navigate to menu
-    setTimeout(() => {
-      navigate('/menu');
-    }, 100);
-  };
-
-  // Local storage fallback login for mobile when API is completely down
-  const tryLocalStorageLogin = async () => {
-    return new Promise((resolve, reject) => {
-      try {
-        // Check multiple user sources
-        const backendUsers = JSON.parse(localStorage.getItem('backendUsers') || '[]');
-        const mobileUsers = JSON.parse(localStorage.getItem('mobileUsers') || '[]');
-        const foodAppUsers = JSON.parse(localStorage.getItem('foodAppUsers') || '[]');
-        
-        const allUsers = [...backendUsers, ...mobileUsers, ...foodAppUsers];
-        console.log('🔍 Checking local storage users:', allUsers.length);
-        
-        const user = allUsers.find(u => 
-          u.username === formData.username && 
-          u.password === formData.password
-        );
-        
-        if (user) {
           const userInfo = {
-            id: user.id || user._id,
-            fullName: user.fullName || user.username,
-            username: user.username,
-            emailAddress: user.emailAddress || user.email,
-            phoneNumber: user.phoneNumber || user.phone,
+            id: data.user._id || data.user.id,
+            fullName: data.user.fullName || data.user.username,
+            username: data.user.username,
+            emailAddress: data.user.emailAddress || data.user.email,
+            phoneNumber: data.user.phoneNumber || data.user.phone,
             isLoggedIn: true,
             loginTime: new Date().toISOString()
           };
           
-          // Save to localStorage
           localStorage.setItem('user', JSON.stringify(userInfo));
           localStorage.setItem('isLoggedIn', 'true');
           
-          // Force storage event for mobile browsers
           window.dispatchEvent(new Event('storage'));
-          
-          // Dispatch custom event
-          const loginEvent = new CustomEvent('userLoggedIn', { 
-            detail: userInfo 
-          });
+          const loginEvent = new CustomEvent('userLoggedIn', { detail: userInfo });
           window.dispatchEvent(loginEvent);
           
-          console.log('🔑 User logged in via local storage:', userInfo);
-          
-          alert(`Welcome back, ${userInfo.fullName || userInfo.username}! (Offline Mode)`);
+          console.log('🔑 User saved to localStorage:', userInfo);
+          alert(`Welcome back, ${userInfo.fullName || userInfo.username}!`);
           
           setTimeout(() => {
             navigate('/menu');
           }, 100);
-          resolve(true);
-        } else {
-          const userExists = allUsers.find(u => u.username === formData.username);
-          if (userExists) {
-            reject(new Error('Invalid password! Please check your password.'));
-          } else {
-            reject(new Error('User not found! Please register first.'));
-          }
+          return;
         }
-      } catch (error) {
-        reject(error);
       }
-    });
+    } catch (backendError) {
+      console.log('⚠️ Backend login failed, trying offline mode...');
+    }
+
+    // If backend fails, try offline mode (for mobile users)
+    try {
+      console.log('📱 Trying offline login...');
+      setUsingOfflineMode(true);
+      
+      const userInfo = await MobileAuth.login(formData.username, formData.password);
+      
+      window.dispatchEvent(new Event('storage'));
+      const loginEvent = new CustomEvent('userLoggedIn', { detail: userInfo });
+      window.dispatchEvent(loginEvent);
+      
+      console.log('🔑 Offline login successful:', userInfo);
+      alert(`Welcome back, ${userInfo.fullName || userInfo.username}! (Offline Mode)`);
+      
+      setTimeout(() => {
+        navigate('/menu');
+      }, 100);
+
+    } catch (offlineError) {
+      console.error('❌ All login methods failed:', offlineError);
+      setError(offlineError.message || 'Login failed. Please check your credentials and try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCreateAccount = () => {
@@ -293,6 +118,15 @@ const Login = () => {
 
   const handleClose = () => {
     navigate('/'); 
+  };
+
+  // Demo login for quick testing
+  const handleDemoLogin = (demoUser) => {
+    setFormData({
+      username: demoUser.username,
+      password: demoUser.password
+    });
+    setUsingOfflineMode(true);
   };
 
   return (
@@ -313,6 +147,14 @@ const Login = () => {
         {error && (
           <div className="mb-4 p-3 bg-red-500/20 border border-red-500 rounded-lg">
             <p className="text-red-300 text-sm">{error}</p>
+          </div>
+        )}
+
+        {usingOfflineMode && (
+          <div className="mb-4 p-3 bg-blue-500/20 border border-blue-500 rounded-lg">
+            <p className="text-blue-300 text-sm text-center">
+              📱 Using offline mode
+            </p>
           </div>
         )}
         
@@ -360,6 +202,27 @@ const Login = () => {
             {loading ? 'Signing In...' : 'Sign In'}
           </button>
         </div>
+
+        {/* Demo Login Buttons */}
+        <div className="mb-4 space-y-2">
+          <p className="text-amber-300 text-sm text-center mb-2">Quick Demo Login:</p>
+          <div className="flex gap-2">
+            <button 
+              type="button"
+              onClick={() => handleDemoLogin({ username: 'demo', password: 'demo123' })}
+              className="flex-1 bg-green-600 text-white py-2 rounded-lg text-sm hover:bg-green-700 transition-colors"
+            >
+              Demo User
+            </button>
+            <button 
+              type="button"
+              onClick={() => handleDemoLogin({ username: 'test', password: 'test123' })}
+              className="flex-1 bg-blue-600 text-white py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors"
+            >
+              Test User
+            </button>
+          </div>
+        </div>
         
         <div className='relative flex justify-center'>
           <FaUserPlus size={20} className='text-amber-500 mr-2' />
@@ -372,10 +235,10 @@ const Login = () => {
           </button>
         </div>
 
-        {/* Mobile-specific help text */}
-        <div className="mt-4 p-3 bg-blue-500/20 border border-blue-500 rounded-lg">
-          <p className="text-blue-300 text-xs text-center">
-            📱 <strong>Mobile Users:</strong> Having issues? Try registering again or check your network connection.
+        {/* Mode indicator */}
+        <div className="mt-4 p-3 bg-green-500/20 border border-green-500 rounded-lg">
+          <p className="text-green-300 text-xs text-center">
+            ✅ <strong>Smart Mode:</strong> Tries backend first, falls back to offline
           </p>
         </div>
       </form> 
