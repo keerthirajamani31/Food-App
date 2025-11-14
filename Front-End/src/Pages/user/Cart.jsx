@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaTrash, FaPlus, FaMinus, FaShoppingCart, FaArrowLeft, FaUser, FaSignInAlt, FaTimes, FaCreditCard } from 'react-icons/fa';
+import { FaTrash, FaPlus, FaMinus, FaShoppingCart, FaArrowLeft, FaUser, FaSignInAlt, FaTimes, FaCreditCard, FaCheck, FaBox } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 
 const Cart = () => {
@@ -8,6 +8,8 @@ const Cart = () => {
   const [user, setUser] = useState(null);
   const [isMobile, setIsMobile] = useState(false);
   const [showCartDrawer, setShowCartDrawer] = useState(false);
+  const [showOrderConfirmation, setShowOrderConfirmation] = useState(false);
+  const [recentOrder, setRecentOrder] = useState(null);
   const navigate = useNavigate();
 
   // Detect mobile device
@@ -108,7 +110,6 @@ const Cart = () => {
     
     setCartItems(normalizedCart);
     localStorage.setItem('cart', JSON.stringify(normalizedCart));
-    // Dispatch event to sync across components
     window.dispatchEvent(new Event('cartUpdate'));
   };
 
@@ -160,7 +161,7 @@ const Cart = () => {
     alert('Logged out successfully!');
   };
 
-  // FIXED: Improved checkout function with better order saving
+  // FIXED: Show order confirmation in cart instead of immediate navigation
   const handleCheckout = () => {
     if (cartItems.length === 0) {
       alert('Your cart is empty!');
@@ -182,7 +183,7 @@ const Cart = () => {
       id: `order_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       customerName: user?.username || 'Customer',
       customerEmail: user?.emailAddress || user?.email || 'No email provided',
-      items: [...cartItems], // Create a copy of cart items
+      items: [...cartItems],
       totalAmount: total.toFixed(2),
       status: 'pending',
       date: new Date().toISOString(),
@@ -205,21 +206,17 @@ const Cart = () => {
       localStorage.setItem('orders', JSON.stringify(existingOrders));
       console.log('✅ Order saved successfully');
       
-      // Dispatch multiple events to ensure all components update
+      // Set recent order and show confirmation
+      setRecentOrder(order);
+      setShowOrderConfirmation(true);
+      
+      // Clear cart
+      clearCart();
+      
+      // Dispatch events for other components
       window.dispatchEvent(new Event('newOrder'));
       window.dispatchEvent(new Event('orderUpdate'));
       window.dispatchEvent(new Event('storage'));
-      
-      alert(`Order placed successfully! Thank you, ${user?.username || 'Customer'}`);
-      
-      // Clear cart and navigate
-      clearCart();
-      if (isMobile) setShowCartDrawer(false);
-      
-      // Navigate to orders page after a short delay
-      setTimeout(() => {
-        navigate('/orders');
-      }, 500);
       
     } catch (error) {
       console.error('❌ Error placing order:', error);
@@ -227,12 +224,93 @@ const Cart = () => {
     }
   };
 
+  const handleViewOrders = () => {
+    setShowOrderConfirmation(false);
+    navigate('/orders');
+  };
+
+  const handleContinueShopping = () => {
+    setShowOrderConfirmation(false);
+    if (isMobile) setShowCartDrawer(false);
+    navigate('/menu');
+  };
+
   const subtotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   const tax = subtotal * 0.1;
   const deliveryFee = subtotal > 0 ? 40 : 0;
   const total = subtotal + tax + deliveryFee;
 
-  // FIXED: Mobile Cart Drawer - This is the ONLY cart for mobile
+  // Order Confirmation Component
+  const OrderConfirmation = () => (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
+      <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+        <div className="bg-green-500 text-white p-6 rounded-t-lg text-center">
+          <FaCheck className="text-4xl mx-auto mb-3" />
+          <h2 className="text-2xl font-bold">Order Placed Successfully!</h2>
+          <p className="text-green-100 mt-2">Thank you for your order</p>
+        </div>
+        
+        <div className="p-6">
+          {recentOrder && (
+            <>
+              <div className="text-center mb-4">
+                <p className="text-gray-600">Order ID: <span className="font-semibold">{recentOrder.id.slice(-8).toUpperCase()}</span></p>
+                <p className="text-gray-600">Total Amount: <span className="font-semibold text-green-600">₹{recentOrder.totalAmount}</span></p>
+                <p className="text-gray-500 text-sm mt-2">Status: <span className="font-semibold text-orange-500">Pending</span></p>
+              </div>
+
+              <div className="border-t border-gray-200 pt-4">
+                <h3 className="font-semibold text-gray-800 mb-3">Order Items:</h3>
+                <div className="space-y-2 max-h-40 overflow-y-auto">
+                  {recentOrder.items.map((item, index) => (
+                    <div key={index} className="flex items-center gap-3 text-sm">
+                      <img 
+                        src={item.image} 
+                        alt={item.name}
+                        className="w-10 h-10 object-cover rounded"
+                      />
+                      <div className="flex-1">
+                        <p className="font-medium">{item.name}</p>
+                        <p className="text-gray-600">Qty: {item.quantity} × ₹{item.price}</p>
+                      </div>
+                      <p className="font-semibold">₹{(item.price * item.quantity).toFixed(2)}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="border-t border-gray-200 pt-4 mt-4">
+                <p className="text-sm text-gray-600">
+                  <strong>Delivery to:</strong> {recentOrder.address}
+                </p>
+                <p className="text-sm text-gray-600 mt-1">
+                  <strong>Payment:</strong> {recentOrder.paymentMethod.replace('-', ' ')}
+                </p>
+              </div>
+            </>
+          )}
+
+          <div className="flex flex-col gap-3 mt-6">
+            <button 
+              onClick={handleViewOrders}
+              className="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors flex items-center justify-center gap-2"
+            >
+              <FaBox />
+              View All Orders
+            </button>
+            <button 
+              onClick={handleContinueShopping}
+              className="w-full bg-gray-500 text-white py-3 rounded-lg font-semibold hover:bg-gray-600 transition-colors"
+            >
+              Continue Shopping
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Mobile Cart Drawer
   const MobileCartDrawer = () => (
     <div className={`fixed inset-0 z-50 transform transition-transform duration-300 ease-in-out ${
       showCartDrawer ? 'translate-x-0' : 'translate-x-full'
@@ -393,7 +471,7 @@ const Cart = () => {
     </div>
   );
 
-  // FIXED: Mobile Floating Cart Button - Only shows when drawer is closed
+  // Mobile Floating Cart Button
   const MobileFloatingCart = () => (
     !showCartDrawer && (
       <div className="fixed bottom-6 right-6 z-40">
@@ -411,6 +489,11 @@ const Cart = () => {
       </div>
     )
   );
+
+  // Show order confirmation if active
+  if (showOrderConfirmation) {
+    return <OrderConfirmation />;
+  }
 
   // Desktop: Show cart regardless of login status
   if (!isMobile) {
