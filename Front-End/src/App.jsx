@@ -17,8 +17,7 @@ import Footer from './Component/user/Footer';
 import Register from './Component/Authentication/Register'
 import AdminOffers from './Component/Admin/AdminOffers';
 import AdminPanel from './Component/Admin/AdminPanel';
-import Orderbooking from './Pages/user/orderBooking';
-
+import Userorder from './Pages/user/Userorder';
 const App = () => {
   return (
     <Router>
@@ -54,7 +53,7 @@ const App = () => {
                 <Route path="login" element={<Login />} />
                 <Route path="logout" element={<Logout />} />
                 <Route path='register' element={<Register/>}/>
-                <Route path='order' element={<Orderbooking/>}/>
+               <Route path='order'element={<Userorder/>}/>
               </Routes>
               <Footer />
             </>
